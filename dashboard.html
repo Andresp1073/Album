@@ -3,27 +3,166 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard</title>
+  <title>Nuestros Álbumes</title>
   <link rel="stylesheet" href="css/style.css">
+  <style>
+    body{
+      margin:0;
+      font-family:Arial, Helvetica, sans-serif;
+      background:linear-gradient(135deg,#fff0f6,#ffe4ec);
+      min-height:100vh;
+      color:#4a2340;
+    }
+
+    .albums-container{
+      max-width:1100px;
+      margin:auto;
+      padding:30px 20px 60px;
+    }
+
+    .topbar{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-bottom:24px;
+    }
+
+    .title-block h1{
+      margin:0;
+      color:#d63384;
+      font-size:2rem;
+    }
+
+    .title-block p{
+      margin:8px 0 0;
+      color:#7a4a63;
+    }
+
+    .actions{
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+
+    .btn{
+      border:none;
+      padding:12px 18px;
+      border-radius:12px;
+      cursor:pointer;
+      font-size:15px;
+      font-weight:bold;
+      transition:.25s ease;
+    }
+
+    .btn-primary{
+      background:#ff6fae;
+      color:white;
+      box-shadow:0 10px 20px rgba(214,51,132,.18);
+    }
+
+    .btn-secondary{
+      background:white;
+      color:#d63384;
+      border:1px solid #ffd0e2;
+    }
+
+    .btn:hover{
+      transform:translateY(-1px);
+    }
+
+    .album-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+      gap:18px;
+    }
+
+    .album-card{
+      background:white;
+      border-radius:20px;
+      padding:22px 18px;
+      box-shadow:0 10px 24px rgba(0,0,0,.08);
+      position:relative;
+      min-height:130px;
+      display:flex;
+      flex-direction:column;
+      justify-content:flex-end;
+    }
+
+    .album-cover{
+      position:absolute;
+      inset:0;
+      background:linear-gradient(135deg,#fff,#fff7fb);
+      border-radius:20px;
+      border:1px solid #ffe0ec;
+    }
+
+    .album-content{
+      position:relative;
+      z-index:1;
+    }
+
+    .album-name{
+      font-size:1.05rem;
+      font-weight:bold;
+      color:#d63384;
+      word-break:break-word;
+      margin-bottom:8px;
+    }
+
+    .album-date{
+      font-size:.9rem;
+      color:#8b6077;
+    }
+
+    .menu-btn{
+      position:absolute;
+      top:12px;
+      right:12px;
+      z-index:2;
+      width:38px;
+      height:38px;
+      border:none;
+      border-radius:999px;
+      background:rgba(255,255,255,.95);
+      box-shadow:0 4px 12px rgba(0,0,0,.08);
+      cursor:pointer;
+      font-size:20px;
+      line-height:1;
+      color:#d63384;
+    }
+
+    .empty-state{
+      background:white;
+      border-radius:20px;
+      padding:32px 20px;
+      text-align:center;
+      color:#7a4a63;
+      box-shadow:0 10px 24px rgba(0,0,0,.06);
+    }
+  </style>
 </head>
 <body>
 
-  <div style="text-align:center;margin-top:100px">
-    <h1>Bienvenido al álbum 💖</h1>
-    <p>Login exitoso</p>
-    <button id="logoutBtn">Cerrar sesión</button>
+  <div class="albums-container">
+    <div class="topbar">
+      <div class="title-block">
+        <h1>Nuestros Álbumes 💖</h1>
+        <p>Guarda aquí los momentos más bonitos de ustedes dos</p>
+      </div>
+
+      <div class="actions">
+        <button class="btn btn-primary" id="createAlbum">Crear álbum</button>
+        <button class="btn btn-secondary" id="logoutBtn">Cerrar sesión</button>
+      </div>
+    </div>
+
+    <div class="album-grid" id="albumGrid"></div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabaseClient.js"></script>
-
-  <script>
-    const logoutBtn = document.getElementById("logoutBtn")
-
-    logoutBtn.addEventListener("click", async () => {
-      await window.supabaseClient.auth.signOut()
-      window.location.href = "index.html"
-    })
-  </script>
+  <script src="js/albums.js"></script>
 </body>
 </html>
