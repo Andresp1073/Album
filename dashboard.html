@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <div style="text-align:center;margin-top:100px">
+    <h1>Bienvenido al álbum 💖</h1>
+    <p>Login exitoso</p>
+    <button id="logoutBtn">Cerrar sesión</button>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabaseClient.js"></script>
+
+  <script>
+    const logoutBtn = document.getElementById("logoutBtn")
+
+    logoutBtn.addEventListener("click", async () => {
+      await window.supabaseClient.auth.signOut()
+      window.location.href = "index.html"
+    })
+  </script>
+</body>
+</html>
