@@ -76,6 +76,10 @@ function renderAlbums(albums) {
       </div>
     `
 
+    card.addEventListener("click", () => {
+      window.location.href = `album.html?id=${album.id}`
+    })
+
     const menuBtn = card.querySelector(".menu-btn")
     menuBtn.addEventListener("click", (e) => {
       e.stopPropagation()

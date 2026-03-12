@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Álbum</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    body{
+      margin:0;
+      font-family:Arial, Helvetica, sans-serif;
+      background:linear-gradient(135deg,#fff0f6,#ffe4ec);
+      min-height:100vh;
+      color:#4a2340;
+    }
+
+    .album-page{
+      max-width:1200px;
+      margin:auto;
+      padding:24px 16px 40px;
+    }
+
+    .album-topbar{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-bottom:20px;
+    }
+
+    .album-title{
+      margin:0;
+      color:#d63384;
+      font-size:1.9rem;
+    }
+
+    .album-subtitle{
+      margin:8px 0 0;
+      color:#7a4a63;
+    }
+
+    .album-actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .btn{
+      border:none;
+      padding:12px 18px;
+      border-radius:12px;
+      cursor:pointer;
+      font-size:15px;
+      font-weight:bold;
+      transition:.25s ease;
+    }
+
+    .btn-primary{
+      background:#ff6fae;
+      color:white;
+      box-shadow:0 10px 20px rgba(214,51,132,.18);
+    }
+
+    .btn-secondary{
+      background:white;
+      color:#d63384;
+      border:1px solid #ffd0e2;
+    }
+
+    .btn:hover{
+      transform:translateY(-1px);
+    }
+
+    .upload-panel{
+      background:white;
+      border-radius:20px;
+      padding:18px;
+      box-shadow:0 10px 24px rgba(0,0,0,.08);
+      margin-bottom:20px;
+    }
+
+    .upload-panel h3{
+      margin:0 0 10px;
+      color:#d63384;
+    }
+
+    .upload-panel p{
+      margin:0 0 14px;
+      color:#7a4a63;
+    }
+
+    .file-input{
+      display:block;
+      width:100%;
+      margin-bottom:12px;
+    }
+
+    .gallery-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fill,minmax(160px,1fr));
+      gap:12px;
+    }
+
+    .media-card{
+      background:white;
+      border-radius:18px;
+      overflow:hidden;
+      box-shadow:0 8px 18px rgba(0,0,0,.08);
+      aspect-ratio:1/1;
+      position:relative;
+      border:1px solid #ffe2ec;
+    }
+
+    .media-inner{
+      width:100%;
+      height:100%;
+      position:relative;
+      background:#fdf6f9;
+    }
+
+    .media-preview{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+      background:#f8f1f5;
+    }
+
+    .media-preview.video-preview{
+      object-fit:cover;
+    }
+
+    .media-badge{
+      position:absolute;
+      top:10px;
+      right:10px;
+      background:rgba(255,255,255,.94);
+      color:#d63384;
+      font-size:.8rem;
+      font-weight:bold;
+      padding:6px 8px;
+      border-radius:999px;
+      box-shadow:0 4px 10px rgba(0,0,0,.08);
+      z-index:2;
+    }
+
+    .media-fallback{
+      width:100%;
+      height:100%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      text-align:center;
+      padding:12px;
+      color:#b15b87;
+      font-weight:bold;
+      line-height:1.4;
+      background:linear-gradient(135deg,#fff,#fff7fb);
+    }
+
+    .empty-media{
+      background:white;
+      border-radius:20px;
+      padding:32px 20px;
+      text-align:center;
+      color:#7a4a63;
+      box-shadow:0 10px 24px rgba(0,0,0,.06);
+    }
+
+    .status-text{
+      margin-top:10px;
+      font-size:.95rem;
+      color:#7a4a63;
+    }
+
+    @media (max-width: 600px){
+      .gallery-grid{
+        grid-template-columns:repeat(3, 1fr);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="album-page">
+    <div class="album-topbar">
+      <div>
+        <h1 class="album-title" id="albumTitle">Álbum</h1>
+        <p class="album-subtitle">Tus fotos y videos se verán aquí en formato galería</p>
+      </div>
+
+      <div class="album-actions">
+        <button class="btn btn-primary" id="backBtn">Volver</button>
+      </div>
+    </div>
+
+    <div class="upload-panel">
+      <h3>Subir archivos 💕</h3>
+      <p>Selecciona fotos o videos para agregarlos a este álbum.</p>
+      <input class="file-input" type="file" id="fileInput" accept="image/*,video/*" multiple>
+      <button class="btn btn-primary" id="uploadBtn">Subir archivos</button>
+      <div class="status-text" id="statusText"></div>
+    </div>
+
+    <div class="gallery-grid" id="galleryGrid"></div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabaseClient.js"></script>
+  <script src="js/album.js"></script>
+</body>
+</html>
