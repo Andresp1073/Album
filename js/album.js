@@ -5,11 +5,23 @@ const fileInput = document.getElementById("fileInput")
 const galleryGrid = document.getElementById("galleryGrid")
 const statusText = document.getElementById("statusText")
 
+const viewerModal = document.getElementById("viewerModal")
+const viewerCloseBtn = document.getElementById("viewerCloseBtn")
+const viewerMenuBtn = document.getElementById("viewerMenuBtn")
+const viewerDropdown = document.getElementById("viewerDropdown")
+const deleteMediaBtn = document.getElementById("deleteMediaBtn")
+const viewerMediaContainer = document.getElementById("viewerMediaContainer")
+
+const confirmModal = document.getElementById("confirmModal")
+const confirmYesBtn = document.getElementById("confirmYesBtn")
+const confirmNoBtn = document.getElementById("confirmNoBtn")
+
 const params = new URLSearchParams(window.location.search)
 const albumId = params.get("id")
 
 let currentUser = null
 let currentAlbum = null
+let currentViewerItem = null
 
 document.addEventListener("DOMContentLoaded", async () => {
   if (!albumId) {
@@ -64,6 +76,75 @@ uploadBtn.addEventListener("click", async () => {
   }
 })
 
+viewerCloseBtn.addEventListener("click", closeViewer)
+
+viewerModal.addEventListener("click", (e) => {
+  if (e.target === viewerModal) {
+    closeViewer()
+  }
+})
+
+viewerMenuBtn.addEventListener("click", (e) => {
+  e.stopPropagation()
+  viewerDropdown.classList.toggle("open")
+})
+
+deleteMediaBtn.addEventListener("click", () => {
+  viewerDropdown.classList.remove("open")
+  confirmModal.style.display = "flex"
+})
+
+confirmNoBtn.addEventListener("click", () => {
+  confirmModal.style.display = "none"
+})
+
+confirmYesBtn.addEventListener("click", async () => {
+  if (!currentViewerItem) return
+
+  confirmYesBtn.disabled = true
+
+  const { error } = await window.supabaseClient
+    .from("media")
+    .update({
+      is_deleted: true,
+      deleted_at: new Date().toISOString()
+    })
+    .eq("id", currentViewerItem.id)
+    .eq("user_id", currentUser.id)
+
+  confirmYesBtn.disabled = false
+  confirmModal.style.display = "none"
+
+  if (error) {
+    alert("Error eliminando archivo: " + error.message)
+    console.error(error)
+    return
+  }
+
+  closeViewer()
+  await loadMedia()
+})
+
+document.addEventListener("click", (e) => {
+  const clickedInsideMenu = viewerMenuBtn.contains(e.target) || viewerDropdown.contains(e.target)
+  if (!clickedInsideMenu) {
+    viewerDropdown.classList.remove("open")
+  }
+})
+
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") {
+    if (confirmModal.style.display === "flex") {
+      confirmModal.style.display = "none"
+      return
+    }
+
+    if (viewerModal.style.display === "flex") {
+      closeViewer()
+    }
+  }
+})
+
 async function loadAlbum() {
   const { data, error } = await window.supabaseClient
     .from("albums")
@@ -85,9 +166,10 @@ async function loadAlbum() {
 async function loadMedia() {
   const { data, error } = await window.supabaseClient
     .from("media")
-    .select("id, file_path, file_type, created_at")
+    .select("id, file_path, file_type, created_at, is_deleted")
     .eq("album_id", albumId)
     .eq("user_id", currentUser.id)
+    .eq("is_deleted", false)
     .order("created_at", { ascending: false })
 
   if (error) {
@@ -160,7 +242,6 @@ async function renderMedia(items) {
       video.muted = true
       video.playsInline = true
       video.preload = "metadata"
-      video.controls = true
 
       video.onerror = () => {
         inner.innerHTML = `
@@ -175,8 +256,48 @@ async function renderMedia(items) {
 
     card.appendChild(inner)
     card.appendChild(badge)
+
+    card.addEventListener("click", () => {
+      openViewer({
+        id: item.id,
+        file_type: item.file_type,
+        signedUrl
+      })
+    })
+
     galleryGrid.appendChild(card)
   }
+}
+
+function openViewer(item) {
+  currentViewerItem = item
+  viewerDropdown.classList.remove("open")
+  viewerMediaContainer.innerHTML = ""
+
+  if (item.file_type === "image") {
+    const img = document.createElement("img")
+    img.className = "viewer-media"
+    img.src = item.signedUrl
+    img.alt = "Foto ampliada"
+    viewerMediaContainer.appendChild(img)
+  } else {
+    const video = document.createElement("video")
+    video.className = "viewer-media"
+    video.src = item.signedUrl
+    video.controls = true
+    video.autoplay = false
+    video.playsInline = true
+    viewerMediaContainer.appendChild(video)
+  }
+
+  viewerModal.style.display = "flex"
+}
+
+function closeViewer() {
+  viewerDropdown.classList.remove("open")
+  viewerModal.style.display = "none"
+  viewerMediaContainer.innerHTML = ""
+  currentViewerItem = null
 }
 
 async function getSignedFileUrl(filePath) {
