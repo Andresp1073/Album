@@ -2,8 +2,15 @@ const grid = document.getElementById("albumGrid")
 const createBtn = document.getElementById("createAlbum")
 const logoutBtn = document.getElementById("logoutBtn")
 
+const createModal = document.getElementById("createModal")
+const createAlbumInput = document.getElementById("createAlbumInput")
+const createAlbumError = document.getElementById("createAlbumError")
+const saveCreateBtn = document.getElementById("saveCreateBtn")
+const cancelCreateBtn = document.getElementById("cancelCreateBtn")
+
 const editModal = document.getElementById("editModal")
 const editAlbumInput = document.getElementById("editAlbumInput")
+const editAlbumError = document.getElementById("editAlbumError")
 const saveEditBtn = document.getElementById("saveEditBtn")
 const cancelEditBtn = document.getElementById("cancelEditBtn")
 
@@ -31,14 +38,41 @@ logoutBtn.addEventListener("click", async () => {
   window.location.href = "index.html"
 })
 
-createBtn.addEventListener("click", async () => {
-  const name = prompt("Nombre del álbum")
+createBtn.addEventListener("click", () => {
+  openCreateModal()
+})
 
-  if (!name || !name.trim()) return
+cancelCreateBtn.addEventListener("click", closeCreateModal)
+cancelEditBtn.addEventListener("click", closeEditModal)
+cancelDeleteBtn.addEventListener("click", closeDeleteModal)
+
+createModal.addEventListener("click", (e) => {
+  if (e.target === createModal) closeCreateModal()
+})
+
+editModal.addEventListener("click", (e) => {
+  if (e.target === editModal) closeEditModal()
+})
+
+deleteModal.addEventListener("click", (e) => {
+  if (e.target === deleteModal) closeDeleteModal()
+})
+
+saveCreateBtn.addEventListener("click", async () => {
+  const name = createAlbumInput.value.trim()
+
+  if (!name) {
+    createAlbumError.textContent = "Escribe un nombre para el álbum."
+    return
+  }
+
+  createAlbumError.textContent = ""
+  saveCreateBtn.disabled = true
 
   const { data: authData, error: authError } = await window.supabaseClient.auth.getUser()
 
   if (authError || !authData.user) {
+    saveCreateBtn.disabled = false
     alert("No hay sesión activa.")
     return
   }
@@ -49,43 +83,43 @@ createBtn.addEventListener("click", async () => {
     .from("albums")
     .insert([
       {
-        name: name.trim(),
+        name,
         user_id: userId
       }
     ])
 
+  saveCreateBtn.disabled = false
+
   if (error) {
-    alert("Error creando álbum: " + error.message)
+    createAlbumError.textContent = error.message
     console.error(error)
     return
   }
 
+  closeCreateModal()
   await loadAlbums()
-})
-
-cancelEditBtn.addEventListener("click", closeEditModal)
-cancelDeleteBtn.addEventListener("click", closeDeleteModal)
-
-editModal.addEventListener("click", (e) => {
-  if (e.target === editModal) closeEditModal()
-})
-
-deleteModal.addEventListener("click", (e) => {
-  if (e.target === deleteModal) closeDeleteModal()
 })
 
 saveEditBtn.addEventListener("click", async () => {
   const newName = editAlbumInput.value.trim()
 
-  if (!newName) return
+  if (!newName) {
+    editAlbumError.textContent = "Escribe un nombre válido."
+    return
+  }
+
+  editAlbumError.textContent = ""
+  saveEditBtn.disabled = true
 
   const { error } = await window.supabaseClient
     .from("albums")
     .update({ name: newName })
     .eq("id", selectedAlbumId)
 
+  saveEditBtn.disabled = false
+
   if (error) {
-    alert("Error editando álbum: " + error.message)
+    editAlbumError.textContent = error.message
     console.error(error)
     return
   }
@@ -95,10 +129,14 @@ saveEditBtn.addEventListener("click", async () => {
 })
 
 confirmDeleteBtn.addEventListener("click", async () => {
+  confirmDeleteBtn.disabled = true
+
   const { error } = await window.supabaseClient
     .from("albums")
     .delete()
     .eq("id", selectedAlbumId)
+
+  confirmDeleteBtn.disabled = false
 
   if (error) {
     alert("Error eliminando álbum: " + error.message)
@@ -122,6 +160,7 @@ document.addEventListener("click", (e) => {
 
 document.addEventListener("keydown", (e) => {
   if (e.key === "Escape") {
+    closeCreateModal()
     closeEditModal()
     closeDeleteModal()
   }
@@ -227,10 +266,24 @@ function renderAlbums(albums) {
   })
 }
 
+function openCreateModal() {
+  createAlbumInput.value = ""
+  createAlbumError.textContent = ""
+  createModal.style.display = "flex"
+  setTimeout(() => createAlbumInput.focus(), 0)
+}
+
+function closeCreateModal() {
+  createModal.style.display = "none"
+  createAlbumInput.value = ""
+  createAlbumError.textContent = ""
+}
+
 function openEditModal(id, name) {
   selectedAlbumId = id
   selectedAlbumName = name
   editAlbumInput.value = name
+  editAlbumError.textContent = ""
   editModal.style.display = "flex"
   setTimeout(() => editAlbumInput.focus(), 0)
 }
@@ -238,6 +291,7 @@ function openEditModal(id, name) {
 function closeEditModal() {
   editModal.style.display = "none"
   editAlbumInput.value = ""
+  editAlbumError.textContent = ""
   selectedAlbumId = null
   selectedAlbumName = ""
 }
