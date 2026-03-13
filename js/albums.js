@@ -265,11 +265,16 @@ function renderAlbums(albums) {
       day: "numeric"
     })
 
+    const safeName = escapeHtml(album.name)
+    const safeCoverUrl = album.cover_url ? encodeURI(album.cover_url) : ""
+
     const coverHtml = album.cover_url
       ? `
-        <div class="album-cover album-cover-image">
-          <img src="${album.cover_url}" alt="Portada del álbum ${escapeHtml(album.name)}" class="album-cover-photo">
-        </div>
+        <div
+          class="album-cover album-cover-image"
+          style="background-image: url('${safeCoverUrl}');"
+          aria-label="Portada del álbum ${safeName}"
+        ></div>
       `
       : `
         <div class="album-cover album-cover-empty">
@@ -287,10 +292,8 @@ function renderAlbums(albums) {
       </div>
 
       <div class="album-content">
-        <div class="album-name album-name-top">${escapeHtml(album.name)}</div>
-
+        <div class="album-name album-name-top">${safeName}</div>
         ${coverHtml}
-
         <div class="album-date">Creado: ${date}</div>
       </div>
     `
