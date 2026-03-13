@@ -674,7 +674,7 @@ function renderAlbums(albums) {
     const date = new Date(album.created_at).toLocaleDateString("es-CO", { year: "numeric", month: "short", day: "numeric" })
 
     const menuWrap = document.createElement("div")
-    menuWrap.className = "menu"
+    menuWrap.className = "menu-wrap"
 
     const menuBtn = document.createElement("button")
     menuBtn.className = "menu-btn"
@@ -685,11 +685,12 @@ function renderAlbums(albums) {
     dropdown.className = "menu-dropdown"
 
     const editBtn = document.createElement("button")
-    editBtn.textContent = "Editar"
+    editBtn.innerHTML = `<span>Editar</span> ✏️`
     editBtn.onclick = (e) => { e.stopPropagation(); dropdown.classList.remove("show"); openEditModal(album.id, album.name) }
 
     const deleteBtn = document.createElement("button")
-    deleteBtn.textContent = "Eliminar"
+    deleteBtn.className = "text-danger";
+    deleteBtn.innerHTML = `<span>Eliminar</span> 🗑️`;
     deleteBtn.onclick = (e) => { e.stopPropagation(); dropdown.classList.remove("show"); openDeleteModal(album.id, album.name) }
 
     dropdown.appendChild(editBtn)
