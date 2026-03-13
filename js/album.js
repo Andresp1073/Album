@@ -1,5 +1,7 @@
 const albumTitle = document.getElementById("albumTitle")
 const backBtn = document.getElementById("backBtn")
+const uploadToggleBtn = document.getElementById("uploadToggleBtn")
+const uploadPanel = document.getElementById("uploadPanel")
 const uploadBtn = document.getElementById("uploadBtn")
 const fileInput = document.getElementById("fileInput")
 const galleryGrid = document.getElementById("galleryGrid")
@@ -46,6 +48,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 backBtn.addEventListener("click", () => {
   window.location.href = "dashboard.html"
+})
+
+uploadToggleBtn.addEventListener("click", () => {
+  uploadPanel.classList.toggle("show")
 })
 
 uploadBtn.addEventListener("click", async () => {

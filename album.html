@@ -88,21 +88,22 @@
     }
 
     .upload-panel{
+      display:none;
       background:white;
-      border-radius:20px;
-      padding:18px;
+      border-radius:16px;
+      padding:16px;
       box-shadow:0 10px 24px rgba(0,0,0,.08);
       margin-bottom:20px;
     }
 
-    .upload-panel h3{
-      margin:0 0 10px;
-      color:#d63384;
+    .upload-panel.show{
+      display:block;
     }
 
     .upload-panel p{
-      margin:0 0 14px;
+      margin:0 0 12px;
       color:#7a4a63;
+      font-size:0.9rem;
     }
 
     .file-input{
@@ -325,13 +326,13 @@
       </div>
 
       <div class="album-actions">
-        <button class="btn btn-primary" id="backBtn">Volver</button>
+        <button class="btn btn-secondary" id="backBtn">← Volver</button>
+        <button class="btn btn-primary" id="uploadToggleBtn">+ Subir</button>
       </div>
     </div>
 
-    <div class="upload-panel">
-      <h3>Subir archivos 💕</h3>
-      <p>Selecciona fotos o videos para agregarlos a este álbum.</p>
+    <div class="upload-panel" id="uploadPanel">
+      <p>Selecciona fotos o videos para este álbum:</p>
       <input class="file-input" type="file" id="fileInput" accept="image/*,video/*" multiple>
       <button class="btn btn-primary" id="uploadBtn">Subir archivos</button>
       <div class="status-text" id="statusText"></div>
