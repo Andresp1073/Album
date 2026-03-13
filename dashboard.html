@@ -29,6 +29,8 @@
     .photo-grid{grid-template-columns:repeat(3,1fr);gap:4px;display:grid}
     .photo-card{background:#f8f8f8;border-radius:4px;overflow:hidden;aspect-ratio:1}
     .photo-img{width:100%;height:100%;object-fit:cover;display:block}
+    .card{background:white;border-radius:14px;padding:10px;box-shadow:0 4px 12px rgba(0,0,0,0.08);position:relative;cursor:pointer}
+    .card-cover{width:100%;height:100px;border-radius:10px;background:linear-gradient(135deg,#fff,#fff7fb);border:1px solid #ffe0ec;background-size:cover;background-position:center;margin-bottom:8px}
     .card-title{font-size:0.95rem;font-weight:bold;color:#d63384;margin-bottom:4px}
     .card-date{font-size:0.8rem;color:#8b6077}
     .menu{position:absolute;top:6px;right:6px;z-index:10}
@@ -57,7 +59,7 @@
     @media (min-width:600px){
       .grid{grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:16px}
       .photo-grid{grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px}
-      .card-cover{height:110px}
+      .card-cover{height:130px}
     }
   </style>
 </head>
