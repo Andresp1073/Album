@@ -8,11 +8,7 @@ const galleryGrid = document.getElementById("galleryGrid")
 const statusText = document.getElementById("statusText")
 
 const viewerModal = document.getElementById("viewerModal")
-const viewerCloseBtn = document.getElementById("viewerCloseBtn")
-const viewerMenuBtn = document.getElementById("viewerMenuBtn")
-const viewerDropdown = document.getElementById("viewerDropdown")
-const deleteMediaBtn = document.getElementById("deleteMediaBtn")
-const viewerMediaContainer = document.getElementById("viewerMediaContainer")
+const viewerContent = document.getElementById("viewerContent")
 
 const confirmModal = document.getElementById("confirmModal")
 const confirmYesBtn = document.getElementById("confirmYesBtn")
@@ -24,6 +20,8 @@ const albumId = params.get("id")
 let currentUser = null
 let currentAlbum = null
 let currentViewerItem = null
+let currentMediaList = []
+let currentViewerIndex = 0
 
 document.addEventListener("DOMContentLoaded", async () => {
   if (!albumId) {
@@ -82,22 +80,42 @@ uploadBtn.addEventListener("click", async () => {
   }
 })
 
-viewerCloseBtn.addEventListener("click", closeViewer)
-
 viewerModal.addEventListener("click", (e) => {
   if (e.target === viewerModal) {
     closeViewer()
   }
 })
 
-viewerMenuBtn.addEventListener("click", (e) => {
-  e.stopPropagation()
-  viewerDropdown.classList.toggle("open")
-})
+let viewerTouchStartX = 0
+let viewerTouchStartY = 0
 
-deleteMediaBtn.addEventListener("click", () => {
-  viewerDropdown.classList.remove("open")
-  confirmModal.style.display = "flex"
+viewerModal.addEventListener("touchstart", (e) => {
+  viewerTouchStartX = e.touches[0].clientX
+  viewerTouchStartY = e.touches[0].clientY
+}, { passive: true })
+
+viewerModal.addEventListener("touchend", (e) => {
+  const endX = e.changedTouches[0].clientX
+  const endY = e.changedTouches[0].clientY
+  const diffX = endX - viewerTouchStartX
+  const diffY = endY - viewerTouchStartY
+  
+  if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 30) {
+    if (diffX > 0) {
+      showPrevMedia()
+    } else {
+      showNextMedia()
+    }
+  } else if (diffY > 50) {
+    closeViewer()
+  }
+}, { passive: true })
+
+document.addEventListener("keydown", (e) => {
+  if (viewerModal.style.display !== "flex") return
+  if (e.key === "ArrowLeft") showPrevMedia()
+  if (e.key === "ArrowRight") showNextMedia()
+  if (e.key === "Escape") closeViewer()
 })
 
 confirmNoBtn.addEventListener("click", () => {
@@ -184,7 +202,8 @@ async function loadMedia() {
     return
   }
 
-  await renderMedia(data || [])
+  currentMediaList = data || []
+  await renderMedia(currentMediaList)
 }
 
 async function renderMedia(items) {
@@ -264,7 +283,9 @@ async function renderMedia(items) {
     card.appendChild(badge)
 
     card.addEventListener("click", () => {
+      const index = currentMediaList.findIndex(m => m.id === item.id)
       openViewer({
+        index,
         id: item.id,
         file_type: item.file_type,
         signedUrl
@@ -277,15 +298,15 @@ async function renderMedia(items) {
 
 function openViewer(item) {
   currentViewerItem = item
-  viewerDropdown.classList.remove("open")
-  viewerMediaContainer.innerHTML = ""
+  currentViewerIndex = item.index
+  viewerContent.innerHTML = ""
 
   if (item.file_type === "image") {
     const img = document.createElement("img")
     img.className = "viewer-media"
     img.src = item.signedUrl
     img.alt = "Foto ampliada"
-    viewerMediaContainer.appendChild(img)
+    viewerContent.appendChild(img)
   } else {
     const video = document.createElement("video")
     video.className = "viewer-media"
@@ -293,17 +314,58 @@ function openViewer(item) {
     video.controls = true
     video.autoplay = false
     video.playsInline = true
-    viewerMediaContainer.appendChild(video)
+    viewerContent.appendChild(video)
   }
 
   viewerModal.style.display = "flex"
 }
 
 function closeViewer() {
-  viewerDropdown.classList.remove("open")
   viewerModal.style.display = "none"
-  viewerMediaContainer.innerHTML = ""
+  viewerContent.innerHTML = ""
   currentViewerItem = null
+  currentViewerIndex = 0
+}
+
+function showPrevMedia() {
+  if (currentViewerIndex > 0) {
+    currentViewerIndex--
+    loadCurrentMedia()
+  }
+}
+
+function showNextMedia() {
+  if (currentViewerIndex < currentMediaList.length - 1) {
+    currentViewerIndex++
+    loadCurrentMedia()
+  }
+}
+
+async function loadCurrentMedia() {
+  const item = currentMediaList[currentViewerIndex]
+  if (!item) return
+
+  currentViewerItem = { index: currentViewerIndex, id: item.id, file_type: item.file_type }
+  viewerContent.innerHTML = ""
+
+  const signedUrl = await getSignedFileUrl(item.file_path)
+  if (!signedUrl) return
+
+  if (item.file_type === "image") {
+    const img = document.createElement("img")
+    img.className = "viewer-media"
+    img.src = signedUrl
+    img.alt = "Foto ampliada"
+    viewerContent.appendChild(img)
+  } else {
+    const video = document.createElement("video")
+    video.className = "viewer-media"
+    video.src = signedUrl
+    video.controls = true
+    video.autoplay = false
+    video.playsInline = true
+    viewerContent.appendChild(video)
+  }
 }
 
 async function getSignedFileUrl(filePath) {
