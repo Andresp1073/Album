@@ -281,6 +281,15 @@ async function loadAllPhotos() {
   }
 
   allMedia = media || []
+  
+  allMedia.forEach(item => {
+    if (!urlCache.has(item.file_path)) {
+      getSignedFileUrl(item.file_path).then(url => {
+        if (url) urlCache.set(item.file_path, url)
+      })
+    }
+  })
+  
   renderAllPhotos()
 }
 
@@ -311,10 +320,7 @@ function renderAllPhotos() {
       card.appendChild(img)
     } else if (item.file_type === "video" && signedUrl) {
       const wrapper = document.createElement("div")
-      wrapper.style.cssText = "width:100%;height:100%;background:#f8f1f5;display:flex;align-items:center;justify-content:center"
-      const playIcon = document.createElement("div")
-      playIcon.innerHTML = "▶️"
-      playIcon.style.cssText = "width:50px;height:50px;border-radius:50%;background:rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;font-size:24px"
+      wrapper.style.cssText = "width:100%;height:100%;background:#f8f1f5;display:flex;align-items:center;justify-content:center;position:relative"
       const video = document.createElement("video")
       video.className = "photo-img"
       video.src = signedUrl
@@ -322,6 +328,32 @@ function renderAllPhotos() {
       video.playsInline = true
       video.preload = "metadata"
       video.style.cssText = "position:absolute;width:100%;height:100%;object-fit:cover;opacity:0"
+      
+      const playIcon = document.createElement("div")
+      playIcon.innerHTML = "▶️"
+      playIcon.style.cssText = "width:50px;height:50px;border-radius:50%;background:rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;font-size:24px;position:absolute;z-index:2"
+      
+      video.onloadeddata = () => {
+        try {
+          video.currentTime = 1
+        } catch(e) {}
+      }
+      
+      video.onseeked = () => {
+        try {
+          const canvas = document.createElement("canvas")
+          canvas.width = video.videoWidth || 200
+          canvas.height = video.videoHeight || 200
+          const ctx = canvas.getContext("2d")
+          ctx.drawImage(video, 0, 0, canvas.width, canvas.height)
+          const thumbUrl = canvas.toDataURL("image/jpeg", 0.7)
+          const thumbImg = document.createElement("img")
+          thumbImg.src = thumbUrl
+          thumbImg.style.cssText = "width:100%;height:100%;object-fit:cover;position:absolute;z-index:1"
+          wrapper.insertBefore(thumbImg, playIcon)
+        } catch(e) {}
+      }
+      
       wrapper.appendChild(video)
       wrapper.appendChild(playIcon)
       card.appendChild(wrapper)
@@ -510,13 +542,22 @@ async function loadAlbums() {
   }
 
   const coverUrlByAlbum = {}
+  
+  mediaItems?.forEach(item => {
+    if (!urlCache.has(item.file_path)) {
+      getSignedFileUrl(item.file_path).then(url => {
+        if (url) urlCache.set(item.file_path, url)
+      })
+    }
+  })
+  
   for (const album of albumsList) {
     const firstImage = firstImageByAlbum[album.id]
     if (!firstImage) {
       coverUrlByAlbum[album.id] = null
       continue
     }
-    const signedUrl = await getSignedFileUrl(firstImage.file_path)
+    const signedUrl = urlCache.get(firstImage.file_path) || await getSignedFileUrl(firstImage.file_path)
     coverUrlByAlbum[album.id] = signedUrl || null
   }
 
