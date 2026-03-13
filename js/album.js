@@ -149,7 +149,7 @@ viewerModal.addEventListener("touchend", (e) => {
 }, { passive: true })
 
 document.addEventListener("keydown", (e) => {
-  if (viewerModal.style.display !== "flex") return
+  if (!viewerModal.classList.contains("show")) return
   if (e.key === "ArrowLeft") showPrevMedia()
   if (e.key === "ArrowRight") showNextMedia()
   if (e.key === "Escape") closeViewer()
@@ -250,10 +250,6 @@ async function renderMedia(items) {
     const inner = document.createElement("div")
     inner.className = "media-inner"
 
-    const badge = document.createElement("div")
-    badge.className = "media-badge"
-    badge.textContent = item.file_type === "image" ? "Foto" : "Video"
-
     const signedUrl = await getSignedFileUrl(item.file_path)
 
     if (!signedUrl) {
@@ -263,7 +259,6 @@ async function renderMedia(items) {
         </div>
       `
       card.appendChild(inner)
-      card.appendChild(badge)
       galleryGrid.appendChild(card)
       continue
     }
@@ -304,7 +299,6 @@ async function renderMedia(items) {
     }
 
     card.appendChild(inner)
-    card.appendChild(badge)
 
     card.addEventListener("click", () => {
       const index = currentMediaList.findIndex(m => m.id === item.id)
@@ -341,11 +335,11 @@ function openViewer(item) {
     viewerContent.appendChild(video)
   }
 
-  viewerModal.style.display = "flex"
+  viewerModal.classList.add("show")
 }
 
 function closeViewer() {
-  viewerModal.style.display = "none"
+  viewerModal.classList.remove("show")
   viewerContent.innerHTML = ""
   currentViewerItem = null
   currentViewerIndex = 0
