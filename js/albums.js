@@ -36,6 +36,7 @@ const deleteViewerBtn = document.getElementById("deleteViewerBtn")
 const longpressModal = document.getElementById("longpressModal")
 const longpressImg = document.getElementById("longpressImg")
 const longpressShare = document.getElementById("longpressShare")
+const longpressDownload = document.getElementById("longpressDownload")
 const longpressDelete = document.getElementById("longpressDelete")
 
 let longpressIndex = null
@@ -478,6 +479,32 @@ longpressShare.addEventListener("click", async () => {
   }
   closeLongpressModal()
 })
+
+if (longpressDownload) {
+  longpressDownload.addEventListener("click", async () => {
+    if (longpressIndex === null) return
+    const item = allMedia[longpressIndex]
+    if (!item) return
+    const url = await getSignedFileUrl(item.file_path)
+    if (!url) return
+    try {
+      const response = await fetch(url)
+      const blob = await response.blob()
+      const blobUrl = URL.createObjectURL(blob)
+      const a = document.createElement("a")
+      a.href = blobUrl
+      a.download = `media-${Date.now()}.${item.file_type === "image" ? "jpg" : "mp4"}`
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      URL.revokeObjectURL(blobUrl)
+    } catch(e) {
+      console.error("Error downloading file", e)
+      window.open(url, "_blank")
+    }
+    closeLongpressModal()
+  })
+}
 
 function closeViewer() {
   viewerModal.classList.remove("show")
