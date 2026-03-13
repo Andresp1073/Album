@@ -3,8 +3,19 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <title>Álbum</title>
+
   <link rel="stylesheet" href="css/style.css">
+
+  <!-- PWA -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#d63384">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Álbum">
+  <link rel="apple-touch-icon" href="/icons/icon-192.png">
+
   <style>
     body{
       margin:0;
@@ -271,9 +282,6 @@
       cursor:pointer;
       font-size:14px;
       font-weight:700;
-      line-height:1.2;
-      appearance:none;
-      -webkit-appearance:none;
     }
 
     .viewer-dropdown button:hover{
@@ -317,19 +325,11 @@
       justify-content:center;
       flex-wrap:wrap;
     }
-
-    @media (max-width: 600px){
-      .gallery-grid{
-        grid-template-columns:repeat(3, 1fr);
-      }
-
-      .viewer-content{
-        height:min(78vh, 620px);
-      }
-    }
   </style>
 </head>
+
 <body>
+
   <div class="album-page">
     <div class="album-topbar">
       <div>
@@ -355,16 +355,19 @@
 
   <div class="viewer-modal" id="viewerModal">
     <div class="viewer-content">
-      <button class="viewer-close" id="viewerCloseBtn" type="button">×</button>
+
+      <button class="viewer-close" id="viewerCloseBtn">×</button>
 
       <div class="viewer-menu-wrap">
-        <button class="viewer-menu-btn" id="viewerMenuBtn" type="button">⋮</button>
+        <button class="viewer-menu-btn" id="viewerMenuBtn">⋮</button>
+
         <div class="viewer-dropdown" id="viewerDropdown">
-          <button type="button" id="deleteMediaBtn">Eliminar</button>
+          <button id="deleteMediaBtn">Eliminar</button>
         </div>
       </div>
 
       <div id="viewerMediaContainer"></div>
+
     </div>
   </div>
 
@@ -372,15 +375,35 @@
     <div class="confirm-card">
       <h3>¿Deseas eliminar este archivo?</h3>
       <p>Si eliges "Sí", dejará de aparecer en este álbum.</p>
+
       <div class="confirm-actions">
-        <button class="btn btn-danger" id="confirmYesBtn" type="button">Sí</button>
-        <button class="btn btn-secondary" id="confirmNoBtn" type="button">No</button>
+        <button class="btn btn-danger" id="confirmYesBtn">Sí</button>
+        <button class="btn btn-secondary" id="confirmNoBtn">No</button>
       </div>
+
     </div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabaseClient.js"></script>
   <script src="js/album.js"></script>
+
+  <!-- PWA -->
+  <script>
+  if ("serviceWorker" in navigator) {
+
+    window.addEventListener("load", () => {
+
+      navigator.serviceWorker.register("/service-worker.js")
+
+      .then(() => console.log("Service Worker registrado"))
+
+      .catch(err => console.log("Error SW", err))
+
+    })
+
+  }
+  </script>
+
 </body>
 </html>

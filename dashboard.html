@@ -3,8 +3,19 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <title>Nuestros Álbumes</title>
+
+  <!-- PWA -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#d63384">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Álbum">
+  <link rel="apple-touch-icon" href="/icons/icon-192.png">
+
   <link rel="stylesheet" href="css/style.css">
+
   <style>
     body{
       margin:0;
@@ -244,6 +255,7 @@
     }
   </style>
 </head>
+
 <body>
 
   <div class="albums-container">
@@ -263,37 +275,40 @@
     <div class="album-grid" id="albumGrid"></div>
   </div>
 
+  <!-- Modal crear -->
   <div class="modal" id="createModal">
     <div class="modal-card">
       <h3>Crear álbum</h3>
       <input type="text" id="createAlbumInput" placeholder="Nombre del álbum">
       <div class="modal-error" id="createAlbumError"></div>
       <div class="modal-actions">
-        <button class="btn btn-primary" id="saveCreateBtn" type="button">Crear</button>
-        <button class="btn btn-secondary" id="cancelCreateBtn" type="button">Cancelar</button>
+        <button class="btn btn-primary" id="saveCreateBtn">Crear</button>
+        <button class="btn btn-secondary" id="cancelCreateBtn">Cancelar</button>
       </div>
     </div>
   </div>
 
+  <!-- Modal editar -->
   <div class="modal" id="editModal">
     <div class="modal-card">
       <h3>Editar álbum</h3>
-      <input type="text" id="editAlbumInput" placeholder="Nuevo nombre del álbum">
+      <input type="text" id="editAlbumInput">
       <div class="modal-error" id="editAlbumError"></div>
       <div class="modal-actions">
-        <button class="btn btn-primary" id="saveEditBtn" type="button">Guardar</button>
-        <button class="btn btn-secondary" id="cancelEditBtn" type="button">Cancelar</button>
+        <button class="btn btn-primary" id="saveEditBtn">Guardar</button>
+        <button class="btn btn-secondary" id="cancelEditBtn">Cancelar</button>
       </div>
     </div>
   </div>
 
+  <!-- Modal eliminar -->
   <div class="modal" id="deleteModal">
     <div class="modal-card">
       <h3>¿Deseas eliminar este álbum?</h3>
       <p>Esta acción eliminará el álbum de tu lista.</p>
       <div class="modal-actions">
-        <button class="btn btn-danger" id="confirmDeleteBtn" type="button">Sí, eliminar</button>
-        <button class="btn btn-secondary" id="cancelDeleteBtn" type="button">No</button>
+        <button class="btn btn-danger" id="confirmDeleteBtn">Sí, eliminar</button>
+        <button class="btn btn-secondary" id="cancelDeleteBtn">No</button>
       </div>
     </div>
   </div>
@@ -301,5 +316,17 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabaseClient.js"></script>
   <script src="js/albums.js"></script>
+
+  <!-- PWA Service Worker -->
+  <script>
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("/service-worker.js")
+        .then(() => console.log("Service Worker registrado"))
+        .catch(err => console.log("Error SW", err))
+      })
+    }
+  </script>
+
 </body>
 </html>

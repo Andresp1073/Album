@@ -1,12 +1,25 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>Nuestro Álbum</title>
 
 <link rel="stylesheet" href="css/style.css">
+
+<!-- PWA -->
+<link rel="manifest" href="/manifest.json">
+
+<meta name="theme-color" content="#d63384">
+
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Álbum">
+
+<link rel="apple-touch-icon" href="/icons/icon-192.png">
+
 </head>
 
 <body>
@@ -15,6 +28,7 @@
 
 <div class="login-container">
   <div class="login-card">
+
     <h1>Nuestro Álbum 💖</h1>
 
     <p class="subtitle">
@@ -22,6 +36,7 @@
     </p>
 
     <form id="loginForm">
+
       <input 
         id="email"
         type="email" 
@@ -39,13 +54,39 @@
       <button type="submit">
         Entrar
       </button>
+
     </form>
+
   </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/supabaseClient.js"></script>
 <script src="js/app.js"></script>
+
+<!-- Service Worker -->
+<script>
+
+if ("serviceWorker" in navigator) {
+
+  window.addEventListener("load", () => {
+
+    navigator.serviceWorker
+      .register("/service-worker.js")
+
+      .then(reg => {
+        console.log("Service Worker registrado", reg)
+      })
+
+      .catch(err => {
+        console.log("Error registrando Service Worker", err)
+      })
+
+  })
+
+}
+
+</script>
 
 </body>
 </html>
