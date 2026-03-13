@@ -19,6 +19,12 @@ const deleteModal = document.getElementById("deleteModal")
 const confirmDeleteBtn = document.getElementById("confirmDeleteBtn")
 const cancelDeleteBtn = document.getElementById("cancelDeleteBtn")
 
+const deleteMediaModal = document.getElementById("deleteMediaModal")
+const confirmDeleteMediaBtn = document.getElementById("confirmDeleteMediaBtn")
+const cancelDeleteMediaBtn = document.getElementById("cancelDeleteMediaBtn")
+
+let selectedMediaIndex = null
+
 const viewerModal = document.getElementById("viewerModal")
 const viewerContent = document.getElementById("viewerContent")
 const muteBtn = document.getElementById("muteBtn")
@@ -94,6 +100,18 @@ createBtn.addEventListener("click", () => {
 cancelCreateBtn.addEventListener("click", closeCreateModal)
 cancelEditBtn.addEventListener("click", closeEditModal)
 cancelDeleteBtn.addEventListener("click", closeDeleteModal)
+
+cancelDeleteMediaBtn.addEventListener("click", () => {
+  deleteMediaModal.style.display = "none"
+  selectedMediaIndex = null
+})
+
+deleteMediaModal.addEventListener("click", (e) => {
+  if (e.target === deleteMediaModal) {
+    deleteMediaModal.style.display = "none"
+    selectedMediaIndex = null
+  }
+})
 
 createModal.addEventListener("click", (e) => {
   if (e.target === createModal) closeCreateModal()
@@ -186,6 +204,37 @@ confirmDeleteBtn.addEventListener("click", async () => {
   await loadAlbums()
 })
 
+confirmDeleteMediaBtn.addEventListener("click", async () => {
+  if (selectedMediaIndex === null) return
+
+  const item = allMedia[selectedMediaIndex]
+  if (!item) return
+
+  confirmDeleteMediaBtn.disabled = true
+
+  const { error } = await window.supabaseClient
+    .from("media")
+    .update({ is_deleted: true, deleted_at: new Date().toISOString() })
+    .eq("id", item.id)
+    .eq("user_id", currentUserId)
+
+  confirmDeleteMediaBtn.disabled = false
+
+  if (error) {
+    alert("Error eliminando archivo: " + error.message)
+    return
+  }
+
+  deleteMediaModal.style.display = "none"
+  selectedMediaIndex = null
+  await loadAllPhotos()
+})
+
+function openDeleteMediaModal(index) {
+  selectedMediaIndex = index
+  deleteMediaModal.style.display = "flex"
+}
+
 document.addEventListener("keydown", (e) => {
   if (e.key === "Escape") {
     closeCreateModal()
@@ -232,25 +281,30 @@ function renderAllPhotos() {
       img.loading = "lazy"
       if (signedUrl) {
         img.src = signedUrl
-        card.addEventListener("click", () => openViewer(index))
       } else {
         img.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect fill='%23f8f1f5' width='100' height='100'/%3E%3Ctext fill='%23b88aa8' x='50' y='50' text-anchor='middle' dy='.3em'%3E📷%3C/text%3E%3C/svg%3E"
       }
       card.appendChild(img)
     } else if (item.file_type === "video") {
-      const video = document.createElement("video")
-      video.className = "photo-img"
-      video.muted = true
-      video.playsInline = true
-      video.preload = "metadata"
+      const wrapper = document.createElement("div")
+      wrapper.className = "photo-img"
+      wrapper.style.cssText = "display:flex;align-items:center;justify-content:center;background:#f8f1f5"
+      wrapper.innerHTML = `<span style="font-size:30px">🎬</span>`
       if (signedUrl) {
-        video.src = signedUrl
-        card.addEventListener("click", () => openViewer(index))
+        wrapper.addEventListener("click", () => openViewer(index))
+        wrapper.style.cursor = "pointer"
       }
-      card.appendChild(video)
+      card.appendChild(wrapper)
     }
 
-    allPhotosGrid.appendChild(card)
+    let pressTimer
+    card.addEventListener("touchstart", () => {
+      pressTimer = setTimeout(() => openDeleteMediaModal(index), 600)
+    })
+    card.addEventListener("touchend", () => {
+      clearTimeout(pressTimer)
+    })
+    card.addEventListener("click", () => openViewer(index))
   })
 }
 
