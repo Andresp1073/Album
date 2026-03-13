@@ -160,7 +160,8 @@ confirmNoBtn.addEventListener("click", () => {
 })
 
 confirmYesBtn.addEventListener("click", async () => {
-  if (!currentViewerItem) return
+  const item = currentMediaList[currentViewerIndex]
+  if (!item) return
 
   confirmYesBtn.disabled = true
 
@@ -170,7 +171,7 @@ confirmYesBtn.addEventListener("click", async () => {
       is_deleted: true,
       deleted_at: new Date().toISOString()
     })
-    .eq("id", currentViewerItem.id)
+    .eq("id", item.id)
     .eq("user_id", currentUser.id)
 
   confirmYesBtn.disabled = false
@@ -246,143 +247,96 @@ async function renderMedia(items) {
   for (const item of items) {
     const card = document.createElement("div")
     card.className = "media-card"
-
-    const inner = document.createElement("div")
-    inner.className = "media-inner"
+    card.style.cursor = "pointer"
 
     const signedUrl = await getSignedFileUrl(item.file_path)
-
-    if (!signedUrl) {
-      inner.innerHTML = `
-        <div class="media-fallback">
-          No se pudo cargar este archivo
-        </div>
-      `
-      card.appendChild(inner)
-      galleryGrid.appendChild(card)
-      continue
-    }
 
     if (item.file_type === "image") {
       const img = document.createElement("img")
       img.className = "media-preview"
-      img.src = signedUrl
-      img.alt = "Foto del álbum"
+      img.src = signedUrl || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect fill='%23f8f1f5' width='100' height='100'/%3E%3Ctext fill='%23b88aa8' x='50' y='50' text-anchor='middle' dy='.3em'%3E📷%3C/text%3E%3C/svg%3E"
       img.loading = "lazy"
-
-      img.onerror = () => {
-        inner.innerHTML = `
-          <div class="media-fallback">
-            No se pudo mostrar la foto
-          </div>
-        `
-      }
-
-      inner.appendChild(img)
-    } else {
+      card.appendChild(img)
+    } else if (item.file_type === "video" && signedUrl) {
       const video = document.createElement("video")
-      video.className = "media-preview video-preview"
+      video.className = "media-preview"
       video.src = signedUrl
       video.muted = true
       video.playsInline = true
       video.preload = "metadata"
-
-      video.onerror = () => {
-        inner.innerHTML = `
-          <div class="media-fallback">
-            No se pudo mostrar el video
-          </div>
-        `
-      }
-
-      inner.appendChild(video)
+      card.appendChild(video)
     }
 
-    card.appendChild(inner)
-
-    card.addEventListener("click", () => {
+    card.onclick = () => {
       const index = currentMediaList.findIndex(m => m.id === item.id)
-      openViewer({
-        index,
-        id: item.id,
-        file_type: item.file_type,
-        signedUrl
-      })
-    })
+      openViewer(index)
+    }
+
+    let pressTimer
+    card.ontouchstart = () => {
+      pressTimer = setTimeout(() => {
+        confirmModal.classList.add("show")
+      }, 600)
+    }
+    card.ontouchend = () => clearTimeout(pressTimer)
 
     galleryGrid.appendChild(card)
   }
 }
 
-function openViewer(item) {
-  currentViewerItem = item
-  currentViewerIndex = item.index
-  viewerContent.innerHTML = ""
+function openViewer(index) {
+  currentViewerIndex = index
+  updateViewer()
+}
 
-  if (item.file_type === "image") {
-    const img = document.createElement("img")
-    img.className = "viewer-media"
-    img.src = item.signedUrl
-    img.alt = "Foto ampliada"
-    viewerContent.appendChild(img)
-  } else {
-    const video = document.createElement("video")
-    video.className = "viewer-media"
-    video.src = item.signedUrl
-    video.controls = true
-    video.autoplay = false
-    video.playsInline = true
-    viewerContent.appendChild(video)
+function updateViewer() {
+  const item = currentMediaList[currentViewerIndex]
+  if (!item) return
+  
+  viewerContent.innerHTML = ""
+  if (currentVideo) {
+    currentVideo.pause()
+    currentVideo = null
   }
 
-  viewerModal.classList.add("show")
+  getSignedFileUrl(item.file_path).then(url => {
+    if (!url) return
+
+    if (item.file_type === "image") {
+      const img = document.createElement("img")
+      img.className = "viewer-media"
+      img.src = url
+      viewerContent.appendChild(img)
+    } else if (item.file_type === "video") {
+      const video = document.createElement("video")
+      video.className = "viewer-media"
+      video.src = url
+      video.controls = true
+      video.autoplay = true
+      video.playsInline = true
+      currentVideo = video
+      viewerContent.appendChild(video)
+    }
+  })
 }
 
 function closeViewer() {
   viewerModal.classList.remove("show")
   viewerContent.innerHTML = ""
-  currentViewerItem = null
   currentViewerIndex = 0
 }
 
 function showPrevMedia() {
   if (currentViewerIndex > 0) {
     currentViewerIndex--
-    loadCurrentMedia()
+    updateViewer()
   }
 }
 
 function showNextMedia() {
   if (currentViewerIndex < currentMediaList.length - 1) {
     currentViewerIndex++
-    loadCurrentMedia()
-  }
-}
-
-async function loadCurrentMedia() {
-  const item = currentMediaList[currentViewerIndex]
-  if (!item) return
-
-  currentViewerItem = { index: currentViewerIndex, id: item.id, file_type: item.file_type }
-  viewerContent.innerHTML = ""
-
-  const signedUrl = await getSignedFileUrl(item.file_path)
-  if (!signedUrl) return
-
-  if (item.file_type === "image") {
-    const img = document.createElement("img")
-    img.className = "viewer-media"
-    img.src = signedUrl
-    img.alt = "Foto ampliada"
-    viewerContent.appendChild(img)
-  } else {
-    const video = document.createElement("video")
-    video.className = "viewer-media"
-    video.src = signedUrl
-    video.controls = true
-    video.autoplay = false
-    video.playsInline = true
-    viewerContent.appendChild(video)
+    updateViewer()
   }
 }
 
