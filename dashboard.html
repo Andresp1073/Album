@@ -26,10 +26,8 @@
     .section{display:none}
     .section.active{display:block}
     .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
-    .photo-grid{grid-template-columns:repeat(3,1fr);gap:8px}
-    .card{background:white;border-radius:14px;padding:10px;box-shadow:0 4px 12px rgba(0,0,0,0.08);position:relative;cursor:pointer}
-    .photo-card{padding:0;border-radius:12px;overflow:hidden;aspect-ratio:1}
-    .card-cover{width:100%;height:90px;border-radius:10px;background:linear-gradient(135deg,#fff,#fff7fb);border:1px solid #ffe0ec;background-size:cover;background-position:center;margin-bottom:8px}
+    .photo-grid{grid-template-columns:repeat(3,1fr);gap:6px}
+    .photo-card{aspect-ratio:1;border-radius:8px}
     .photo-img{width:100%;height:100%;object-fit:cover}
     .card-title{font-size:0.95rem;font-weight:bold;color:#d63384;margin-bottom:4px}
     .card-date{font-size:0.8rem;color:#8b6077}
@@ -58,7 +56,7 @@
     .viewer-next{right:10px}
     @media (min-width:600px){
       .grid{grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:16px}
-      .photo-grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px}
+      .photo-grid{grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px}
       .card-cover{height:110px}
     }
   </style>
