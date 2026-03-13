@@ -206,10 +206,10 @@ input[type="text"]:focus {
 }
 
 .album-cover-image {
-  background-size: cover;
+  background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
-  background-color: #f8dce8;
+  background-color: #fff;
 }
 
 .album-cover-empty {
