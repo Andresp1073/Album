@@ -345,7 +345,7 @@ async function loadAlbums() {
     .eq("user_id", userId)
     .eq("file_type", "image")
     .eq("is_deleted", false)
-    .order("created_at", { ascending: false })
+    .order("created_at", { ascending: true })
 
   if (mediaError) {
     alert("Error cargando portadas de álbumes: " + mediaError.message)
