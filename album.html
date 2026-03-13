@@ -8,7 +8,6 @@
 
   <link rel="stylesheet" href="css/style.css">
 
-  <!-- PWA -->
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#d63384">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -327,9 +326,7 @@
     }
   </style>
 </head>
-
 <body>
-
   <div class="album-page">
     <div class="album-topbar">
       <div>
@@ -355,19 +352,16 @@
 
   <div class="viewer-modal" id="viewerModal">
     <div class="viewer-content">
-
-      <button class="viewer-close" id="viewerCloseBtn">×</button>
+      <button class="viewer-close" id="viewerCloseBtn" type="button">×</button>
 
       <div class="viewer-menu-wrap">
-        <button class="viewer-menu-btn" id="viewerMenuBtn">⋮</button>
-
+        <button class="viewer-menu-btn" id="viewerMenuBtn" type="button">⋮</button>
         <div class="viewer-dropdown" id="viewerDropdown">
-          <button id="deleteMediaBtn">Eliminar</button>
+          <button type="button" id="deleteMediaBtn">Eliminar</button>
         </div>
       </div>
 
       <div id="viewerMediaContainer"></div>
-
     </div>
   </div>
 
@@ -375,35 +369,16 @@
     <div class="confirm-card">
       <h3>¿Deseas eliminar este archivo?</h3>
       <p>Si eliges "Sí", dejará de aparecer en este álbum.</p>
-
       <div class="confirm-actions">
-        <button class="btn btn-danger" id="confirmYesBtn">Sí</button>
-        <button class="btn btn-secondary" id="confirmNoBtn">No</button>
+        <button class="btn btn-danger" id="confirmYesBtn" type="button">Sí</button>
+        <button class="btn btn-secondary" id="confirmNoBtn" type="button">No</button>
       </div>
-
     </div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabaseClient.js"></script>
   <script src="js/album.js"></script>
-
-  <!-- PWA -->
-  <script>
-  if ("serviceWorker" in navigator) {
-
-    window.addEventListener("load", () => {
-
-      navigator.serviceWorker.register("/service-worker.js")
-
-      .then(() => console.log("Service Worker registrado"))
-
-      .catch(err => console.log("Error SW", err))
-
-    })
-
-  }
-  </script>
-
+  <script src="js/pwa.js"></script>
 </body>
 </html>

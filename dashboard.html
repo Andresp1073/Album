@@ -6,7 +6,6 @@
 
   <title>Nuestros Álbumes</title>
 
-  <!-- PWA -->
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#d63384">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -275,7 +274,6 @@
     <div class="album-grid" id="albumGrid"></div>
   </div>
 
-  <!-- Modal crear -->
   <div class="modal" id="createModal">
     <div class="modal-card">
       <h3>Crear álbum</h3>
@@ -288,7 +286,6 @@
     </div>
   </div>
 
-  <!-- Modal editar -->
   <div class="modal" id="editModal">
     <div class="modal-card">
       <h3>Editar álbum</h3>
@@ -301,7 +298,6 @@
     </div>
   </div>
 
-  <!-- Modal eliminar -->
   <div class="modal" id="deleteModal">
     <div class="modal-card">
       <h3>¿Deseas eliminar este álbum?</h3>
@@ -316,17 +312,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabaseClient.js"></script>
   <script src="js/albums.js"></script>
-
-  <!-- PWA Service Worker -->
-  <script>
-    if ("serviceWorker" in navigator) {
-      window.addEventListener("load", () => {
-        navigator.serviceWorker.register("/service-worker.js")
-        .then(() => console.log("Service Worker registrado"))
-        .catch(err => console.log("Error SW", err))
-      })
-    }
-  </script>
+  <script src="js/pwa.js"></script>
 
 </body>
 </html>
