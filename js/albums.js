@@ -1,4 +1,5 @@
 const grid = document.getElementById("albumGrid")
+const allPhotosGrid = document.getElementById("allPhotosGrid")
 const createBtn = document.getElementById("createAlbum")
 const logoutBtn = document.getElementById("logoutBtn")
 
@@ -20,6 +21,17 @@ const cancelDeleteBtn = document.getElementById("cancelDeleteBtn")
 
 let selectedAlbumId = null
 let selectedAlbumName = ""
+let currentUserId = null
+let allMedia = []
+
+document.querySelectorAll(".tab").forEach(tab => {
+  tab.addEventListener("click", () => {
+    document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"))
+    document.querySelectorAll(".section").forEach(s => s.classList.remove("active"))
+    tab.classList.add("active")
+    document.getElementById("section-" + tab.dataset.tab).classList.add("active")
+  })
+})
 
 document.addEventListener("DOMContentLoaded", async () => {
   const { data, error } = await window.supabaseClient.auth.getUser()
@@ -30,6 +42,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     return
   }
 
+  currentUserId = data.user.id
+  await loadAllPhotos()
   await loadAlbums()
 })
 
@@ -170,6 +184,51 @@ document.addEventListener("keydown", (e) => {
     closeDeleteModal()
   }
 })
+
+async function loadAllPhotos() {
+  const { data: media, error } = await window.supabaseClient
+    .from("media")
+    .select("id, album_id, file_path, file_type, created_at")
+    .eq("user_id", currentUserId)
+    .eq("is_deleted", false)
+    .order("created_at", { ascending: false })
+
+  if (error) {
+    console.error("Error cargando fotos:", error)
+    return
+  }
+
+  allMedia = media || []
+  renderAllPhotos()
+}
+
+function renderAllPhotos() {
+  allPhotosGrid.innerHTML = ""
+
+  if (!allMedia.length) {
+    allPhotosGrid.innerHTML = `<div class="empty">No hay fotos todavía 💕<br>Sube fotos a un álbum para verlas aquí</div>`
+    return
+  }
+
+  allMedia.forEach(async (item) => {
+    const card = document.createElement("div")
+    card.className = "card photo-card"
+
+    const img = document.createElement("img")
+    img.className = "photo-img"
+    img.loading = "lazy"
+
+    const signedUrl = await getSignedFileUrl(item.file_path)
+    if (signedUrl) {
+      img.src = signedUrl
+    } else {
+      img.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect fill='%23f8f1f5' width='100' height='100'/%3E%3Ctext fill='%23b88aa8' x='50' y='50' text-anchor='middle' dy='.3em'%3E📷%3C/text%3E%3C/svg%3E"
+    }
+
+    card.appendChild(img)
+    allPhotosGrid.appendChild(card)
+  })
+}
 
 async function loadAlbums() {
   const { data: authData, error: authError } = await window.supabaseClient.auth.getUser()
