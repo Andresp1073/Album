@@ -286,11 +286,9 @@ async function renderMedia(items) {
 }
 
 function openViewer(index) {
-  console.log("openViewer called")
   currentViewerIndex = index
   updateViewer()
-  viewerModal.style.display = "flex !important"
-  console.log("Modal display set to:", viewerModal.style.display)
+  viewerModal.setAttribute("style", "display: flex !important;")
 }
 
 function updateViewer() {
