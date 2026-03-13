@@ -265,47 +265,67 @@ function renderAlbums(albums) {
       day: "numeric"
     })
 
-    const safeName = escapeHtml(album.name)
-    const safeCoverUrl = album.cover_url ? encodeURI(album.cover_url) : ""
+    const menuWrap = document.createElement("div")
+    menuWrap.className = "menu-wrap"
 
-    const coverHtml = album.cover_url
-      ? `
-        <div
-          class="album-cover album-cover-image"
-          style="background-image: url('${safeCoverUrl}');"
-          aria-label="Portada del álbum ${safeName}"
-        ></div>
-      `
-      : `
-        <div class="album-cover album-cover-empty">
-          <span>Sin portada 💕</span>
-        </div>
-      `
+    const menuBtn = document.createElement("button")
+    menuBtn.className = "menu-btn"
+    menuBtn.type = "button"
+    menuBtn.textContent = "⋮"
 
-    card.innerHTML = `
-      <div class="menu-wrap">
-        <button class="menu-btn" type="button">⋮</button>
-        <div class="menu-dropdown">
-          <button type="button" class="edit-album-btn">Editar</button>
-          <button type="button" class="delete-album-btn">Eliminar</button>
-        </div>
-      </div>
+    const dropdown = document.createElement("div")
+    dropdown.className = "menu-dropdown"
 
-      <div class="album-content">
-        <div class="album-name album-name-top">${safeName}</div>
-        ${coverHtml}
-        <div class="album-date">Creado: ${date}</div>
-      </div>
-    `
+    const editBtn = document.createElement("button")
+    editBtn.type = "button"
+    editBtn.className = "edit-album-btn"
+    editBtn.textContent = "Editar"
+
+    const deleteBtn = document.createElement("button")
+    deleteBtn.type = "button"
+    deleteBtn.className = "delete-album-btn"
+    deleteBtn.textContent = "Eliminar"
+
+    dropdown.appendChild(editBtn)
+    dropdown.appendChild(deleteBtn)
+    menuWrap.appendChild(menuBtn)
+    menuWrap.appendChild(dropdown)
+
+    const content = document.createElement("div")
+    content.className = "album-content"
+
+    const nameEl = document.createElement("div")
+    nameEl.className = "album-name album-name-top"
+    nameEl.textContent = album.name
+
+    const coverEl = document.createElement("div")
+    coverEl.className = "album-cover"
+
+    if (album.cover_url) {
+      coverEl.classList.add("album-cover-image")
+      coverEl.style.backgroundImage = `url("${album.cover_url}")`
+      coverEl.setAttribute("aria-label", `Portada del álbum ${album.name}`)
+    } else {
+      coverEl.classList.add("album-cover-empty")
+      const emptyText = document.createElement("span")
+      emptyText.textContent = "Sin portada 💕"
+      coverEl.appendChild(emptyText)
+    }
+
+    const dateEl = document.createElement("div")
+    dateEl.className = "album-date"
+    dateEl.textContent = `Creado: ${date}`
+
+    content.appendChild(nameEl)
+    content.appendChild(coverEl)
+    content.appendChild(dateEl)
+
+    card.appendChild(menuWrap)
+    card.appendChild(content)
 
     card.addEventListener("click", () => {
       window.location.href = `album.html?id=${album.id}`
     })
-
-    const menuBtn = card.querySelector(".menu-btn")
-    const dropdown = card.querySelector(".menu-dropdown")
-    const editBtn = card.querySelector(".edit-album-btn")
-    const deleteBtn = card.querySelector(".delete-album-btn")
 
     menuBtn.addEventListener("click", (e) => {
       e.stopPropagation()
@@ -386,10 +406,4 @@ async function getSignedFileUrl(filePath) {
   }
 
   return data.signedUrl
-}
-
-function escapeHtml(text) {
-  const div = document.createElement("div")
-  div.textContent = text
-  return div.innerHTML
 }
