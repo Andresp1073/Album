@@ -180,7 +180,7 @@ async function loadAlbums() {
     .from("albums")
     .select("id, name, created_at, user_id")
     .eq("user_id", userId)
-    .order("created_at", { ascending: false })
+    .order("created_at", { ascending: true })
 
   if (error) {
     alert("Error cargando álbumes: " + error.message)
