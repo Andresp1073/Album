@@ -287,6 +287,7 @@ async function renderMedia(items) {
 function openViewer(index) {
   currentViewerIndex = index
   updateViewer()
+  viewerModal.style.display = "flex"
 }
 
 function updateViewer() {
@@ -321,7 +322,7 @@ function updateViewer() {
 }
 
 function closeViewer() {
-  viewerModal.classList.remove("show")
+  viewerModal.style.display = "none"
   viewerContent.innerHTML = ""
   currentViewerIndex = 0
 }
