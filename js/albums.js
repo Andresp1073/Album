@@ -294,34 +294,27 @@ function renderAlbums(albums) {
     const content = document.createElement("div")
     content.className = "album-content"
 
-    const nameEl = document.createElement("div")
-    nameEl.className = "album-name album-name-top"
-    nameEl.textContent = album.name
-
     const coverEl = document.createElement("div")
     coverEl.className = "album-cover"
 
     if (album.cover_url) {
-      coverEl.classList.add("album-cover-image")
       coverEl.style.backgroundImage = `url("${album.cover_url}")`
       coverEl.setAttribute("aria-label", `Portada del álbum ${album.name}`)
-    } else {
-      coverEl.classList.add("album-cover-empty")
-      const emptyText = document.createElement("span")
-      emptyText.textContent = "Sin portada 💕"
-      coverEl.appendChild(emptyText)
     }
+
+    const nameEl = document.createElement("div")
+    nameEl.className = "album-name"
+    nameEl.textContent = album.name
 
     const dateEl = document.createElement("div")
     dateEl.className = "album-date"
     dateEl.textContent = `Creado: ${date}`
 
     content.appendChild(nameEl)
-    content.appendChild(coverEl)
     content.appendChild(dateEl)
-
-    card.appendChild(menuWrap)
     card.appendChild(content)
+    card.appendChild(coverEl)
+    card.appendChild(menuWrap)
 
     card.addEventListener("click", () => {
       window.location.href = `album.html?id=${album.id}`
