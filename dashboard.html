@@ -33,12 +33,7 @@
     .card-cover{width:100%;height:100px;border-radius:10px;background:linear-gradient(135deg,#fff,#fff7fb);border:1px solid #ffe0ec;background-size:cover;background-position:center;margin-bottom:8px}
     .card-title{font-size:0.95rem;font-weight:bold;color:#d63384;margin-bottom:4px}
     .card-date{font-size:0.8rem;color:#8b6077}
-    .menu{position:absolute;top:6px;right:6px;z-index:10}
-    .menu-btn{border:none;background:rgba(255,255,255,0.85);font-size:18px;cursor:pointer;padding:2px 6px;color:#d63384;border-radius:4px}
-    .menu-dropdown{display:none;position:absolute;top:32px;right:0;min-width:120px;background:white;border-radius:10px;box-shadow:0 6px 16px rgba(0,0,0,0.15);border:1px solid #ffd9e8;z-index:20}
-    .menu-dropdown.show{display:block}
-    .menu-dropdown button{width:100%;border:none;background:white;color:#d63384;padding:10px;text-align:left;cursor:pointer;font-size:13px;font-weight:bold}
-    .menu-dropdown button:hover{background:#fff2f7}
+
     .empty{background:white;border-radius:16px;padding:30px 20px;text-align:center;color:#7a4a63;grid-column:1/-1}
     .empty-photos{grid-column:1/-1;display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
     .empty-photo{aspect-ratio:1;background:#f8f1f5;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#b88aa8;font-size:13px}
@@ -52,11 +47,7 @@
     .viewer-modal.show{display:flex}
     .viewer-content{width:100%;height:100%;display:flex;align-items:center;justify-content:center;padding:0}
     .viewer-img,.viewer-video{max-width:100%;max-height:100%;object-fit:contain}
-    .viewer-menu-btn{position:absolute;top:15px;right:15px;width:40px;height:40px;border:none;border-radius:50%;background:rgba(255,255,255,0.2);color:white;font-size:22px;cursor:pointer;z-index:10}
-    .viewer-menu{display:none;position:absolute;top:60px;right:15px;background:white;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,0.3);z-index:11;overflow:hidden}
-    .viewer-menu.show{display:block}
-    .viewer-menu button{width:100%;display:block;padding:14px 20px;border:none;background:white;color:#333;font-size:15px;text-align:left;cursor:pointer}
-    .viewer-menu button:hover{background:#f5f5f5}
+
     .viewer-delete-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);align-items:center;justify-content:center;z-index:9999}
     .viewer-delete-modal.show{display:flex}
     .viewer-delete-card{background:white;border-radius:16px;padding:24px;text-align:center}
@@ -154,8 +145,12 @@
   <div class="viewer-modal" id="viewerModal">
     <button class="viewer-menu-btn" id="viewerMenuBtn">⋮</button>
     <div class="viewer-menu" id="viewerMenu">
-      <button id="shareBtn">📤 Compartir</button>
-      <button id="deleteViewerBtn">🗑️ Eliminar</button>
+      <button id="shareBtn">
+        <span>Compartir...</span> 📤
+      </button>
+      <button id="deleteViewerBtn" class="text-danger">
+        <span>Eliminar</span> 🗑️
+      </button>
     </div>
     <div class="viewer-content" id="viewerContent">
       <img class="viewer-img" id="viewerImg" src="">

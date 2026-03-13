@@ -103,40 +103,7 @@
       box-shadow:0 8px 20px rgba(0,0,0,.08);
     }
 
-    .trash-dropdown{
-      display:none;
-      position:absolute;
-      top:52px;
-      right:0;
-      min-width:220px;
-      background:white;
-      border-radius:14px;
-      box-shadow:0 14px 28px rgba(0,0,0,.18);
-      overflow:hidden;
-      border:1px solid #ffd9e8;
-      z-index:20;
-    }
 
-    .trash-dropdown.open{
-      display:block;
-    }
-
-    .trash-dropdown button{
-      width:100%;
-      display:block;
-      border:none;
-      background:white;
-      color:#d63384;
-      padding:14px 16px;
-      text-align:left;
-      cursor:pointer;
-      font-size:14px;
-      font-weight:700;
-    }
-
-    .trash-dropdown button:hover{
-      background:#fff2f7;
-    }
 
     .gallery-grid{
       display:grid;
@@ -256,39 +223,7 @@
       box-shadow:0 8px 20px rgba(0,0,0,.2);
     }
 
-    .viewer-dropdown{
-      display:none;
-      position:absolute;
-      top:52px;
-      right:0;
-      min-width:220px;
-      background:white;
-      border-radius:14px;
-      box-shadow:0 14px 28px rgba(0,0,0,.18);
-      overflow:hidden;
-      border:1px solid #ffd9e8;
-    }
 
-    .viewer-dropdown.open{
-      display:block;
-    }
-
-    .viewer-dropdown button{
-      width:100%;
-      display:block;
-      border:none;
-      background:white;
-      color:#d63384;
-      padding:14px 16px;
-      text-align:left;
-      cursor:pointer;
-      font-size:14px;
-      font-weight:700;
-    }
-
-    .viewer-dropdown button:hover{
-      background:#fff2f7;
-    }
 
     .confirm-modal{
       position:fixed;
@@ -342,8 +277,12 @@
         <div class="trash-menu-wrap">
           <button class="trash-menu-btn" id="trashMenuBtn" type="button">⋮</button>
           <div class="trash-dropdown" id="trashDropdown">
-            <button type="button" id="restoreAllBtn">Recuperar todo</button>
-            <button type="button" id="emptyTrashBtn">Vaciar la papelera</button>
+            <button type="button" id="restoreAllBtn">
+              <span>Recuperar todo</span> ♻️
+            </button>
+            <button type="button" id="emptyTrashBtn" class="text-danger">
+              <span>Vaciar la papelera</span> 🗑️
+            </button>
           </div>
         </div>
       </div>
@@ -359,8 +298,12 @@
       <div class="viewer-menu-wrap">
         <button class="viewer-menu-btn" id="viewerMenuBtn" type="button">⋮</button>
         <div class="viewer-dropdown" id="viewerDropdown">
-          <button type="button" id="restoreOneBtn">Recuperar</button>
-          <button type="button" id="deleteForeverBtn">Eliminar definitivamente</button>
+          <button type="button" id="restoreOneBtn">
+            <span>Recuperar</span> ♻️
+          </button>
+          <button type="button" id="deleteForeverBtn" class="text-danger">
+            <span>Eliminar definitivamente</span> 🗑️
+          </button>
         </div>
       </div>
 
