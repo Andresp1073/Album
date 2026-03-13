@@ -27,15 +27,14 @@ let selectedMediaIndex = null
 
 const viewerModal = document.getElementById("viewerModal")
 const viewerContent = document.getElementById("viewerContent")
+const viewerImg = document.getElementById("viewerImg")
 
-let currentPhotoIndex = 0
-let currentVideo = null
-
-let currentPhotoIndex = 0
 let selectedAlbumId = null
 let selectedAlbumName = ""
 let currentUserId = null
 let allMedia = []
+let currentPhotoIndex = 0
+let currentVideo = null
 const urlCache = new Map()
 
 async function getSignedFileUrl(filePath) {
@@ -331,11 +330,12 @@ function updateViewer() {
     if (!url) return
 
     if (item.file_type === "image") {
-      const img = document.createElement("img")
-      img.className = "viewer-img"
-      img.src = url
-      viewerContent.appendChild(img)
+      viewerImg.src = url
+      viewerImg.style.display = "block"
+      viewerContent.innerHTML = ""
+      viewerContent.appendChild(viewerImg)
     } else if (item.file_type === "video") {
+      viewerImg.style.display = "none"
       const video = document.createElement("video")
       video.className = "viewer-video"
       video.src = url
@@ -343,9 +343,7 @@ function updateViewer() {
       video.autoplay = true
       video.playsInline = true
       currentVideo = video
-      viewerContent.appendChild(video)
-    }
-      currentVideo = video
+      viewerContent.innerHTML = ""
       viewerContent.appendChild(video)
     }
   })
