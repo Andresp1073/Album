@@ -33,6 +33,13 @@ const viewerMenu = document.getElementById("viewerMenu")
 const shareBtn = document.getElementById("shareBtn")
 const deleteViewerBtn = document.getElementById("deleteViewerBtn")
 
+const longpressModal = document.getElementById("longpressModal")
+const longpressImg = document.getElementById("longpressImg")
+const longpressShare = document.getElementById("longpressShare")
+const longpressDelete = document.getElementById("longpressDelete")
+
+let longpressIndex = null
+
 let selectedAlbumId = null
 let selectedAlbumName = ""
 let currentUserId = null
@@ -362,14 +369,14 @@ function renderAllPhotos() {
     card.onclick = () => openViewer(index)
     card.oncontextmenu = (e) => {
       e.preventDefault()
-      openDeleteMediaModal(index)
+      showLongpressModal(index)
     }
     
     let pressTimer
     card.ontouchstart = () => {
       pressTimer = setTimeout(() => {
-        openDeleteMediaModal(index)
-      }, 600)
+        showLongpressModal(index)
+      }, 500)
     }
     card.ontouchend = () => clearTimeout(pressTimer)
 
@@ -415,6 +422,62 @@ function updateViewer() {
     }
   })
 }
+
+function showLongpressModal(index) {
+  longpressIndex = index
+  const item = allMedia[index]
+  if (!item) return
+  
+  getSignedFileUrl(item.file_path).then(url => {
+    if (url) {
+      longpressImg.src = url
+      longpressModal.classList.add("show")
+    }
+  })
+}
+
+function closeLongpressModal() {
+  longpressModal.classList.remove("show")
+  longpressIndex = null
+}
+
+longpressModal?.addEventListener("click", (e) => {
+  if (e.target === longpressModal) closeLongpressModal()
+})
+
+if (longpressDelete) {
+  longpressDelete.addEventListener("click", () => {
+    closeLongpressModal()
+    if (longpressIndex !== null) {
+      openDeleteMediaModal(longpressIndex)
+    }
+  })
+} else {
+  console.error("longpressDelete button not found!")
+}
+
+longpressShare.addEventListener("click", async () => {
+  if (longpressIndex === null) return
+  const item = allMedia[longpressIndex]
+  if (!item) return
+  const url = await getSignedFileUrl(item.file_path)
+  if (!url) return
+  if (navigator.share) {
+    try {
+      if (item.file_type === "image") {
+        const response = await fetch(url)
+        const blob = await response.blob()
+        const file = new File([blob], "foto.jpg", { type: "image/jpeg" })
+        await navigator.share({ files: [file] })
+      } else {
+        await navigator.share({ url, title: "Video" })
+      }
+    } catch(e) {}
+  } else {
+    window.open(url, "_blank")
+  }
+  closeLongpressModal()
+})
 
 function closeViewer() {
   viewerModal.classList.remove("show")

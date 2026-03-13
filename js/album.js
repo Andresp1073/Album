@@ -28,6 +28,11 @@ let currentMediaList = []
 let currentViewerIndex = 0
 let currentVideo = null
 const urlCache = new Map()
+const longpressModal = document.getElementById("longpressModal")
+const longpressImg = document.getElementById("longpressImg")
+const longpressShare = document.getElementById("longpressShare")
+const longpressDelete = document.getElementById("longpressDelete")
+let longpressIndex = null
 
 document.addEventListener("DOMContentLoaded", async () => {
   if (!albumId) {
@@ -315,8 +320,8 @@ async function renderMedia(items) {
     let pressTimer
     card.ontouchstart = () => {
       pressTimer = setTimeout(() => {
-        confirmModal.classList.add("show")
-      }, 600)
+        showLongpressModal(index)
+      }, 500)
     }
     card.ontouchend = () => clearTimeout(pressTimer)
 
@@ -360,6 +365,58 @@ function updateViewer() {
     }
   })
 }
+
+function showLongpressModal(index) {
+  longpressIndex = index
+  const item = currentMediaList[index]
+  if (!item) return
+  
+  getSignedFileUrl(item.file_path).then(url => {
+    if (url) {
+      longpressImg.src = url
+      longpressModal.classList.add("show")
+    }
+  })
+}
+
+function closeLongpressModal() {
+  longpressModal.classList.remove("show")
+  longpressIndex = null
+}
+
+longpressModal?.addEventListener("click", (e) => {
+  if (e.target === longpressModal) closeLongpressModal()
+})
+
+longpressDelete?.addEventListener("click", () => {
+  closeLongpressModal()
+  if (longpressIndex !== null) {
+    confirmModal.classList.add("show")
+  }
+})
+
+longpressShare?.addEventListener("click", async () => {
+  if (longpressIndex === null) return
+  const item = currentMediaList[longpressIndex]
+  if (!item) return
+  const url = await getSignedFileUrl(item.file_path)
+  if (!url) return
+  if (navigator.share) {
+    try {
+      if (item.file_type === "image") {
+        const response = await fetch(url)
+        const blob = await response.blob()
+        const file = new File([blob], "foto.jpg", { type: "image/jpeg" })
+        await navigator.share({ files: [file] })
+      } else {
+        await navigator.share({ url, title: "Video" })
+      }
+    } catch(e) {}
+  } else {
+    window.open(url, "_blank")
+  }
+  closeLongpressModal()
+})
 
 function closeViewer() {
   viewerModal.style.display = "none"
