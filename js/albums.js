@@ -223,7 +223,7 @@ function renderAllPhotos() {
 
   allMedia.forEach(async (item, index) => {
     const card = document.createElement("div")
-    card.className = "card photo-card"
+    card.className = "photo-card"
 
     const img = document.createElement("img")
     img.className = "photo-img"
