@@ -304,15 +304,7 @@ function renderAllPhotos() {
       video.muted = true
       video.playsInline = true
       video.preload = "metadata"
-      const playIcon = document.createElement("div")
-      playIcon.style.cssText = "position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:28px;pointer-events:none"
-      playIcon.innerHTML = "▶️"
-      const wrapper = document.createElement("div")
-      wrapper.className = "photo-img"
-      wrapper.style.position = "relative"
-      wrapper.appendChild(video)
-      wrapper.appendChild(playIcon)
-      card.appendChild(wrapper)
+      card.appendChild(video)
     }
 
     card.onclick = () => openViewer(index)
