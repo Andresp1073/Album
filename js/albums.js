@@ -310,13 +310,21 @@ function renderAllPhotos() {
       }
       card.appendChild(img)
     } else if (item.file_type === "video" && signedUrl) {
+      const wrapper = document.createElement("div")
+      wrapper.style.cssText = "width:100%;height:100%;background:#f8f1f5;display:flex;align-items:center;justify-content:center"
+      const playIcon = document.createElement("div")
+      playIcon.innerHTML = "▶️"
+      playIcon.style.cssText = "width:50px;height:50px;border-radius:50%;background:rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;font-size:24px"
       const video = document.createElement("video")
       video.className = "photo-img"
       video.src = signedUrl
       video.muted = true
       video.playsInline = true
       video.preload = "metadata"
-      card.appendChild(video)
+      video.style.cssText = "position:absolute;width:100%;height:100%;object-fit:cover;opacity:0"
+      wrapper.appendChild(video)
+      wrapper.appendChild(playIcon)
+      card.appendChild(wrapper)
     }
 
     card.onclick = () => openViewer(index)
