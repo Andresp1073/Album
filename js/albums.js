@@ -272,6 +272,7 @@ function renderAllPhotos() {
   allMedia.forEach(async (item, index) => {
     const card = document.createElement("div")
     card.className = "photo-card"
+    card.style.cursor = "pointer"
 
     const signedUrl = await getSignedFileUrl(item.file_path)
 
@@ -290,21 +291,24 @@ function renderAllPhotos() {
       wrapper.className = "photo-img"
       wrapper.style.cssText = "display:flex;align-items:center;justify-content:center;background:#f8f1f5"
       wrapper.innerHTML = `<span style="font-size:30px">🎬</span>`
-      if (signedUrl) {
-        wrapper.addEventListener("click", () => openViewer(index))
-        wrapper.style.cursor = "pointer"
-      }
       card.appendChild(wrapper)
     }
 
+    card.onclick = () => openViewer(index)
+    card.oncontextmenu = (e) => {
+      e.preventDefault()
+      openDeleteMediaModal(index)
+    }
+    
     let pressTimer
-    card.addEventListener("touchstart", () => {
-      pressTimer = setTimeout(() => openDeleteMediaModal(index), 600)
-    })
-    card.addEventListener("touchend", () => {
-      clearTimeout(pressTimer)
-    })
-    card.addEventListener("click", () => openViewer(index))
+    card.ontouchstart = () => {
+      pressTimer = setTimeout(() => {
+        openDeleteMediaModal(index)
+      }, 600)
+    }
+    card.ontouchend = () => clearTimeout(pressTimer)
+
+    allPhotosGrid.appendChild(card)
   })
 }
 
