@@ -176,19 +176,70 @@ async function loadAlbums() {
 
   const userId = authData.user.id
 
-  const { data, error } = await window.supabaseClient
+  const { data: albums, error: albumsError } = await window.supabaseClient
     .from("albums")
     .select("id, name, created_at, user_id")
     .eq("user_id", userId)
     .order("created_at", { ascending: true })
 
-  if (error) {
-    alert("Error cargando álbumes: " + error.message)
-    console.error(error)
+  if (albumsError) {
+    alert("Error cargando álbumes: " + albumsError.message)
+    console.error(albumsError)
     return
   }
 
-  renderAlbums(data || [])
+  const albumsList = albums || []
+
+  if (!albumsList.length) {
+    renderAlbums([])
+    return
+  }
+
+  const albumIds = albumsList.map((album) => album.id)
+
+  const { data: mediaItems, error: mediaError } = await window.supabaseClient
+    .from("media")
+    .select("album_id, file_path, created_at")
+    .in("album_id", albumIds)
+    .eq("user_id", userId)
+    .eq("file_type", "image")
+    .eq("is_deleted", false)
+    .order("created_at", { ascending: true })
+
+  if (mediaError) {
+    alert("Error cargando portadas de álbumes: " + mediaError.message)
+    console.error(mediaError)
+    return
+  }
+
+  const firstImageByAlbum = {}
+
+  for (const item of mediaItems || []) {
+    if (!firstImageByAlbum[item.album_id]) {
+      firstImageByAlbum[item.album_id] = item
+    }
+  }
+
+  const coverUrlByAlbum = {}
+
+  for (const album of albumsList) {
+    const firstImage = firstImageByAlbum[album.id]
+
+    if (!firstImage) {
+      coverUrlByAlbum[album.id] = null
+      continue
+    }
+
+    const signedUrl = await getSignedFileUrl(firstImage.file_path)
+    coverUrlByAlbum[album.id] = signedUrl || null
+  }
+
+  const albumsWithCover = albumsList.map((album) => ({
+    ...album,
+    cover_url: coverUrlByAlbum[album.id] || null
+  }))
+
+  renderAlbums(albumsWithCover)
 }
 
 function renderAlbums(albums) {
@@ -214,8 +265,31 @@ function renderAlbums(albums) {
       day: "numeric"
     })
 
+    const coverHtml = album.cover_url
+      ? `
+        <div class="album-cover" style="
+          background-image: url('${album.cover_url}');
+          background-size: cover;
+          background-position: center;
+          background-repeat: no-repeat;
+        "></div>
+      `
+      : `
+        <div class="album-cover" style="
+          background: linear-gradient(135deg, #fff8fb 0%, #ffe3ef 100%);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: #d63384;
+          font-weight: 700;
+          font-size: 14px;
+        ">
+          Sin portada 💕
+        </div>
+      `
+
     card.innerHTML = `
-      <div class="album-cover"></div>
+      ${coverHtml}
 
       <div class="menu-wrap">
         <button class="menu-btn" type="button">⋮</button>
@@ -306,6 +380,19 @@ function closeDeleteModal() {
   deleteModal.style.display = "none"
   selectedAlbumId = null
   selectedAlbumName = ""
+}
+
+async function getSignedFileUrl(filePath) {
+  const { data, error } = await window.supabaseClient.storage
+    .from("album-media")
+    .createSignedUrl(filePath, 3600)
+
+  if (error || !data?.signedUrl) {
+    console.error("Error generando signed URL para portada:", error)
+    return null
+  }
+
+  return data.signedUrl
 }
 
 function escapeHtml(text) {
