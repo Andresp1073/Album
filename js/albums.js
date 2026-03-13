@@ -27,9 +27,8 @@ let selectedMediaIndex = null
 
 const viewerModal = document.getElementById("viewerModal")
 const viewerContent = document.getElementById("viewerContent")
-const muteBtn = document.getElementById("muteBtn")
 
-let isMuted = true
+let currentPhotoIndex = 0
 let currentVideo = null
 
 let currentPhotoIndex = 0
@@ -323,7 +322,6 @@ function updateViewer() {
   if (!item) return
   
   viewerContent.innerHTML = ""
-  muteBtn.style.display = "none"
   if (currentVideo) {
     currentVideo.pause()
     currentVideo = null
@@ -338,15 +336,15 @@ function updateViewer() {
       img.src = url
       viewerContent.appendChild(img)
     } else if (item.file_type === "video") {
-      muteBtn.style.display = "block"
-      muteBtn.textContent = isMuted ? "🔇" : "🔊"
       const video = document.createElement("video")
       video.className = "viewer-video"
       video.src = url
-      video.muted = isMuted
-      video.controls = false
+      video.controls = true
       video.autoplay = true
       video.playsInline = true
+      currentVideo = video
+      viewerContent.appendChild(video)
+    }
       currentVideo = video
       viewerContent.appendChild(video)
     }
@@ -374,15 +372,6 @@ function showNext() {
     updateViewer()
   }
 }
-
-muteBtn.addEventListener("click", (e) => {
-  e.stopPropagation()
-  isMuted = !isMuted
-  muteBtn.textContent = isMuted ? "🔇" : "🔊"
-  if (currentVideo) {
-    currentVideo.muted = isMuted
-  }
-})
 
 viewerModal.addEventListener("click", (e) => {
   if (e.target === viewerModal) closeViewer()
