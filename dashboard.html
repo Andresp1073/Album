@@ -145,8 +145,15 @@
       transition:opacity .2s;
     }
 
-    .album-card:hover .menu-wrap{
+    .album-card:hover .menu-wrap,
+    .menu-wrap:focus-within{
       opacity:1;
+    }
+
+    @media (hover:none) and (pointer:coarse){
+      .menu-wrap{
+        opacity:1;
+      }
     }
 
     .menu-btn{
