@@ -20,7 +20,11 @@ const confirmDeleteBtn = document.getElementById("confirmDeleteBtn")
 const cancelDeleteBtn = document.getElementById("cancelDeleteBtn")
 
 const viewerModal = document.getElementById("viewerModal")
-const viewerImg = document.getElementById("viewerImg")
+const viewerContent = document.getElementById("viewerContent")
+const muteBtn = document.getElementById("muteBtn")
+
+let isMuted = true
+let currentVideo = null
 
 let currentPhotoIndex = 0
 let selectedAlbumId = null
@@ -212,7 +216,7 @@ function renderAllPhotos() {
   allPhotosGrid.innerHTML = ""
 
   if (!allMedia.length) {
-    allPhotosGrid.innerHTML = `<div class="empty">No hay fotos todavía 💕<br>Sube fotos a un álbum para verlas aquí</div>`
+    allPhotosGrid.innerHTML = `<div class="empty">No hay archivos todavía 💕<br>Sube fotos o videos a un álbum para verlos aquí</div>`
     return
   }
 
@@ -220,54 +224,107 @@ function renderAllPhotos() {
     const card = document.createElement("div")
     card.className = "photo-card"
 
-    const img = document.createElement("img")
-    img.className = "photo-img"
-    img.loading = "lazy"
-
     const signedUrl = await getSignedFileUrl(item.file_path)
-    if (signedUrl) {
-      img.src = signedUrl
-      card.addEventListener("click", () => openViewer(index))
-    } else {
-      img.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect fill='%23f8f1f5' width='100' height='100'/%3E%3Ctext fill='%23b88aa8' x='50' y='50' text-anchor='middle' dy='.3em'%3E📷%3C/text%3E%3C/svg%3E"
+
+    if (item.file_type === "image") {
+      const img = document.createElement("img")
+      img.className = "photo-img"
+      img.loading = "lazy"
+      if (signedUrl) {
+        img.src = signedUrl
+        card.addEventListener("click", () => openViewer(index))
+      } else {
+        img.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect fill='%23f8f1f5' width='100' height='100'/%3E%3Ctext fill='%23b88aa8' x='50' y='50' text-anchor='middle' dy='.3em'%3E📷%3C/text%3E%3C/svg%3E"
+      }
+      card.appendChild(img)
+    } else if (item.file_type === "video") {
+      const video = document.createElement("video")
+      video.className = "photo-img"
+      video.muted = true
+      video.playsInline = true
+      video.preload = "metadata"
+      if (signedUrl) {
+        video.src = signedUrl
+        card.addEventListener("click", () => openViewer(index))
+      }
+      card.appendChild(video)
     }
 
-    card.appendChild(img)
     allPhotosGrid.appendChild(card)
   })
 }
 
 function openViewer(index) {
   currentPhotoIndex = index
-  updateViewerImage()
+  updateViewer()
   viewerModal.classList.add("show")
 }
 
-function updateViewerImage() {
+function updateViewer() {
   const item = allMedia[currentPhotoIndex]
   if (!item) return
+  
+  viewerContent.innerHTML = ""
+  muteBtn.style.display = "none"
+  if (currentVideo) {
+    currentVideo.pause()
+    currentVideo = null
+  }
+
   getSignedFileUrl(item.file_path).then(url => {
-    if (url) viewerImg.src = url
+    if (!url) return
+
+    if (item.file_type === "image") {
+      const img = document.createElement("img")
+      img.className = "viewer-img"
+      img.src = url
+      viewerContent.appendChild(img)
+    } else if (item.file_type === "video") {
+      muteBtn.style.display = "block"
+      muteBtn.textContent = isMuted ? "🔇" : "🔊"
+      const video = document.createElement("video")
+      video.className = "viewer-video"
+      video.src = url
+      video.muted = isMuted
+      video.controls = false
+      video.autoplay = true
+      video.playsInline = true
+      currentVideo = video
+      viewerContent.appendChild(video)
+    }
   })
 }
 
 function closeViewer() {
   viewerModal.classList.remove("show")
+  if (currentVideo) {
+    currentVideo.pause()
+    currentVideo = null
+  }
 }
 
 function showPrev() {
   if (currentPhotoIndex > 0) {
     currentPhotoIndex--
-    updateViewerImage()
+    updateViewer()
   }
 }
 
 function showNext() {
   if (currentPhotoIndex < allMedia.length - 1) {
     currentPhotoIndex++
-    updateViewerImage()
+    updateViewer()
   }
 }
+
+muteBtn.addEventListener("click", (e) => {
+  e.stopPropagation()
+  isMuted = !isMuted
+  muteBtn.textContent = isMuted ? "🔇" : "🔊"
+  if (currentVideo) {
+    currentVideo.muted = isMuted
+  }
+})
 
 viewerModal.addEventListener("click", (e) => {
   if (e.target === viewerModal) closeViewer()
