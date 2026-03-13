@@ -26,6 +26,7 @@ let currentAlbum = null
 let currentViewerItem = null
 let currentMediaList = []
 let currentViewerIndex = 0
+let currentVideo = null
 
 document.addEventListener("DOMContentLoaded", async () => {
   if (!albumId) {
