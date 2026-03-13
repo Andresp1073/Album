@@ -23,9 +23,6 @@ const viewerModal = document.getElementById("viewerModal")
 const viewerImg = document.getElementById("viewerImg")
 
 let currentPhotoIndex = 0
-let touchStartX = 0
-let touchEndX = 0
-let touchStartY = 0
 
 let selectedAlbumId = null
 let selectedAlbumName = ""
@@ -277,31 +274,30 @@ viewerModal.addEventListener("click", (e) => {
   if (e.target === viewerModal) closeViewer()
 })
 
+let viewerTouchStartX = 0
+let viewerTouchStartY = 0
+
 viewerModal.addEventListener("touchstart", (e) => {
-  touchStartX = e.changedTouches[0].screenX
-  touchStartY = e.changedTouches[0].screenY
-})
+  viewerTouchStartX = e.touches[0].clientX
+  viewerTouchStartY = e.touches[0].clientY
+}, { passive: true })
 
 viewerModal.addEventListener("touchend", (e) => {
-  touchEndX = e.changedTouches[0].screenX
-  const touchEndY = e.changedTouches[0].screenY
-  handleSwipe(touchEndY)
-})
-
-function handleSwipe(endY) {
-  const swipeThreshold = 50
-  const diffY = endY - touchStartY
+  const endX = e.changedTouches[0].clientX
+  const endY = e.changedTouches[0].clientY
+  const diffX = endX - viewerTouchStartX
+  const diffY = endY - viewerTouchStartY
   
-  if (diffY > swipeThreshold) {
-    closeViewer()
-  } else if (Math.abs(touchEndX - touchStartX) > swipeThreshold) {
-    if (touchEndX < touchStartX) {
-      showNext()
-    } else {
+  if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 30) {
+    if (diffX > 0) {
       showPrev()
+    } else {
+      showNext()
     }
+  } else if (diffY > 50) {
+    closeViewer()
   }
-}
+}, { passive: true })
 
 document.addEventListener("keydown", (e) => {
   if (!viewerModal.classList.contains("show")) return
