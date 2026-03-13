@@ -267,30 +267,17 @@ function renderAlbums(albums) {
 
     const coverHtml = album.cover_url
       ? `
-        <div class="album-cover" style="
-          background-image: url('${album.cover_url}');
-          background-size: cover;
-          background-position: center;
-          background-repeat: no-repeat;
-        "></div>
+        <div class="album-cover album-cover-image">
+          <img src="${album.cover_url}" alt="Portada del álbum ${escapeHtml(album.name)}" class="album-cover-photo">
+        </div>
       `
       : `
-        <div class="album-cover" style="
-          background: linear-gradient(135deg, #fff8fb 0%, #ffe3ef 100%);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          color: #d63384;
-          font-weight: 700;
-          font-size: 14px;
-        ">
-          Sin portada 💕
+        <div class="album-cover album-cover-empty">
+          <span>Sin portada 💕</span>
         </div>
       `
 
     card.innerHTML = `
-      ${coverHtml}
-
       <div class="menu-wrap">
         <button class="menu-btn" type="button">⋮</button>
         <div class="menu-dropdown">
@@ -300,7 +287,10 @@ function renderAlbums(albums) {
       </div>
 
       <div class="album-content">
-        <div class="album-name">${escapeHtml(album.name)}</div>
+        <div class="album-name album-name-top">${escapeHtml(album.name)}</div>
+
+        ${coverHtml}
+
         <div class="album-date">Creado: ${date}</div>
       </div>
     `
