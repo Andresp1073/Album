@@ -269,7 +269,6 @@ async function renderMedia(items) {
 
     card.onclick = () => {
       const index = currentMediaList.findIndex(m => m.id === item.id)
-      alert("Click en foto: " + index)
       openViewer(index)
     }
 
@@ -286,6 +285,7 @@ async function renderMedia(items) {
 }
 
 function openViewer(index) {
+  alert("openViewer called, index=" + index + ", viewerModal=" + viewerModal + ", viewerContent=" + viewerContent)
   currentViewerIndex = index
   updateViewer()
   viewerModal.style.display = "flex"
