@@ -131,6 +131,11 @@ saveEditBtn.addEventListener("click", async () => {
 confirmDeleteBtn.addEventListener("click", async () => {
   confirmDeleteBtn.disabled = true
 
+  await window.supabaseClient
+    .from("media")
+    .delete()
+    .eq("album_id", selectedAlbumId)
+
   const { error } = await window.supabaseClient
     .from("albums")
     .delete()
