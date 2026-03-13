@@ -120,7 +120,7 @@ shareBtn.addEventListener("click", async () => {
 
 deleteViewerBtn.addEventListener("click", () => {
   viewerMenu.classList.remove("show")
-  confirmModal.style.display = "flex"
+  confirmModal.classList.add("show")
 })
 
 let viewerTouchStartX = 0
@@ -156,7 +156,7 @@ document.addEventListener("keydown", (e) => {
 })
 
 confirmNoBtn.addEventListener("click", () => {
-  confirmModal.style.display = "none"
+  confirmModal.classList.remove("show")
 })
 
 confirmYesBtn.addEventListener("click", async () => {
@@ -174,7 +174,7 @@ confirmYesBtn.addEventListener("click", async () => {
     .eq("user_id", currentUser.id)
 
   confirmYesBtn.disabled = false
-  confirmModal.style.display = "none"
+  confirmModal.classList.remove("show")
 
   if (error) {
     alert("Error eliminando archivo: " + error.message)
@@ -186,15 +186,12 @@ confirmYesBtn.addEventListener("click", async () => {
   await loadMedia()
 })
 
-document.addEventListener("click", (e) => {
-  const clickedInsideMenu = viewerMenuBtn.contains(e.target) || viewerDropdown.contains(e.target)
-  if (!clickedInsideMenu) {
-    viewerDropdown.classList.remove("open")
-  }
-})
-
 document.addEventListener("keydown", (e) => {
   if (e.key === "Escape") {
+    confirmModal.classList.remove("show")
+    closeViewer()
+  }
+})
     if (confirmModal.style.display === "flex") {
       confirmModal.style.display = "none"
       return

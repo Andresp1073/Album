@@ -116,9 +116,12 @@ cancelCreateBtn.addEventListener("click", closeCreateModal)
 cancelEditBtn.addEventListener("click", closeEditModal)
 cancelDeleteBtn.addEventListener("click", closeDeleteModal)
 
-cancelDeleteMediaBtn.addEventListener("click", () => {
-  deleteMediaModal.style.display = "none"
-  selectedMediaIndex = null
+cancelDeleteMediaBtn.addEventListener("click", closeDeleteMediaModal)
+
+deleteMediaModal.addEventListener("click", (e) => {
+  if (e.target === deleteMediaModal) {
+    closeDeleteMediaModal()
+  }
 })
 
 deleteMediaModal.addEventListener("click", (e) => {
@@ -240,14 +243,18 @@ confirmDeleteMediaBtn.addEventListener("click", async () => {
     return
   }
 
-  deleteMediaModal.style.display = "none"
-  selectedMediaIndex = null
+  closeDeleteMediaModal()
   await loadAllPhotos()
 })
 
 function openDeleteMediaModal(index) {
   selectedMediaIndex = index
-  deleteMediaModal.style.display = "flex"
+  deleteMediaModal.classList.add("show")
+}
+
+function closeDeleteMediaModal() {
+  deleteMediaModal.classList.remove("show")
+  selectedMediaIndex = null
 }
 
 document.addEventListener("keydown", (e) => {
@@ -255,6 +262,7 @@ document.addEventListener("keydown", (e) => {
     closeCreateModal()
     closeEditModal()
     closeDeleteModal()
+    closeDeleteMediaModal()
     closeViewer()
   }
 })
