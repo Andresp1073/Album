@@ -321,16 +321,10 @@ function renderAlbums(albums) {
       dropdown.classList.toggle("show")
     })
 
-    editBtn.addEventListener("click", (e) => {
-      e.stopPropagation()
-      dropdown.classList.remove("open")
-      openEditModal(album.id, album.name)
-    })
-
-    deleteBtn.addEventListener("click", (e) => {
-      e.stopPropagation()
-      dropdown.classList.remove("open")
-      openDeleteModal(album.id, album.name)
+    document.addEventListener("click", (e) => {
+      if (!dropdown.contains(e.target)) {
+        dropdown.classList.remove("show")
+      }
     })
 
     grid.appendChild(card)
