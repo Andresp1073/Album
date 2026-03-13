@@ -1,4 +1,4 @@
-const CACHE_NAME = "couple-album-v2"
+const CACHE_NAME = "couple-album-v3"
 
 const urlsToCache = [
   "/",
@@ -17,6 +17,6 @@ self.addEventListener("install", event => {
 
 self.addEventListener("fetch", event => {
   event.respondWith(
-    caches.match(event.request).then(response => response || fetch(event.request))
+    fetch(event.request).catch(() => caches.match(event.request))
   )
 })
