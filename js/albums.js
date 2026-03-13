@@ -55,7 +55,10 @@ async function getSignedFileUrl(filePath) {
   return data.signedUrl
 }
 
-const savedTab = localStorage.getItem("active_tab") || "fotos"
+document.querySelectorAll(".section").forEach(s => s.classList.remove("active"))
+document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"))
+
+const savedTab = localStorage.getItem("active_tab") || "albumes"
 
 document.querySelectorAll(".tab").forEach(tab => {
   if (tab.dataset.tab === savedTab) {
