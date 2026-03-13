@@ -267,11 +267,13 @@ function renderAlbums(albums) {
 
     const menuWrap = document.createElement("div")
     menuWrap.className = "menu-wrap"
+    menuWrap.style.cssText = "position:absolute;top:4px;right:4px;z-index:999;"
 
     const menuBtn = document.createElement("button")
     menuBtn.className = "menu-btn"
     menuBtn.type = "button"
     menuBtn.textContent = "⋮"
+    menuBtn.style.cssText = "background:none;border:none;font-size:20px;cursor:pointer;padding:4px 8px;color:#d63384;"
 
     const dropdown = document.createElement("div")
     dropdown.className = "menu-dropdown"
