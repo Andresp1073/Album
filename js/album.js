@@ -269,6 +269,7 @@ async function renderMedia(items) {
 
     card.onclick = () => {
       const index = currentMediaList.findIndex(m => m.id === item.id)
+      alert("Click en foto: " + index)
       openViewer(index)
     }
 
