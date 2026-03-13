@@ -21,13 +21,11 @@ const cancelDeleteBtn = document.getElementById("cancelDeleteBtn")
 
 const viewerModal = document.getElementById("viewerModal")
 const viewerImg = document.getElementById("viewerImg")
-const viewerClose = document.getElementById("viewerClose")
-const viewerPrev = document.getElementById("viewerPrev")
-const viewerNext = document.getElementById("viewerNext")
 
 let currentPhotoIndex = 0
 let touchStartX = 0
 let touchEndX = 0
+let touchStartY = 0
 
 let selectedAlbumId = null
 let selectedAlbumName = ""
@@ -275,29 +273,33 @@ function showNext() {
   }
 }
 
-viewerClose.addEventListener("click", closeViewer)
-viewerPrev.addEventListener("click", showPrev)
-viewerNext.addEventListener("click", showNext)
-
 viewerModal.addEventListener("click", (e) => {
   if (e.target === viewerModal) closeViewer()
 })
 
 viewerModal.addEventListener("touchstart", (e) => {
   touchStartX = e.changedTouches[0].screenX
+  touchStartY = e.changedTouches[0].screenY
 })
 
 viewerModal.addEventListener("touchend", (e) => {
   touchEndX = e.changedTouches[0].screenX
-  handleSwipe()
+  const touchEndY = e.changedTouches[0].screenY
+  handleSwipe(touchEndY)
 })
 
-function handleSwipe() {
+function handleSwipe(endY) {
   const swipeThreshold = 50
-  if (touchEndX < touchStartX - swipeThreshold) {
-    showNext()
-  } else if (touchEndX > touchStartX + swipeThreshold) {
-    showPrev()
+  const diffY = endY - touchStartY
+  
+  if (diffY > swipeThreshold) {
+    closeViewer()
+  } else if (Math.abs(touchEndX - touchStartX) > swipeThreshold) {
+    if (touchEndX < touchStartX) {
+      showNext()
+    } else {
+      showPrev()
+    }
   }
 }
 
@@ -305,6 +307,7 @@ document.addEventListener("keydown", (e) => {
   if (!viewerModal.classList.contains("show")) return
   if (e.key === "ArrowLeft") showPrev()
   if (e.key === "ArrowRight") showNext()
+  if (e.key === "Escape") closeViewer()
 })
 
 async function loadAlbums() {

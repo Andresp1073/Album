@@ -34,7 +34,7 @@
     .card-title{font-size:0.95rem;font-weight:bold;color:#d63384;margin-bottom:4px}
     .card-date{font-size:0.8rem;color:#8b6077}
     .menu{position:absolute;top:6px;right:6px;z-index:10}
-    .menu-btn{border:none;background:transparent;font-size:20px;cursor:pointer;padding:4px;color:#d63384}
+    .menu-btn{border:none;background:rgba(255,255,255,0.85);font-size:18px;cursor:pointer;padding:2px 6px;color:#d63384;border-radius:4px}
     .menu-dropdown{display:none;position:absolute;top:32px;right:0;min-width:120px;background:white;border-radius:10px;box-shadow:0 6px 16px rgba(0,0,0,0.15);border:1px solid #ffd9e8;z-index:20}
     .menu-dropdown.show{display:block}
     .menu-dropdown button{width:100%;border:none;background:white;color:#d63384;padding:10px;text-align:left;cursor:pointer;font-size:13px;font-weight:bold}
@@ -50,12 +50,8 @@
     .modal-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
     .viewer-modal{position:fixed;inset:0;background:rgba(0,0,0,0.95);display:none;align-items:center;justify-content:center;z-index:2000}
     .viewer-modal.show{display:flex}
-    .viewer-close{position:absolute;top:20px;right:20px;width:44px;height:44px;border:none;border-radius:50%;background:rgba(255,255,255,0.2);color:white;font-size:24px;cursor:pointer;z-index:10}
-    .viewer-content{width:100%;height:100%;display:flex;align-items:center;justify-content:center;padding:40px}
+    .viewer-content{width:100%;height:100%;display:flex;align-items:center;justify-content:center;padding:20px}
     .viewer-img{max-width:100%;max-height:100%;object-fit:contain}
-    .viewer-prev,.viewer-next{position:absolute;top:50%;transform:translateY(-50%);width:50px;height:50px;border:none;border-radius:50%;background:rgba(255,255,255,0.2);color:white;font-size:30px;cursor:pointer}
-    .viewer-prev{left:10px}
-    .viewer-next{right:10px}
     @media (min-width:600px){
       .grid{grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:16px}
       .photo-grid{grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px}
@@ -113,12 +109,9 @@
   </div>
 
   <div class="viewer-modal" id="viewerModal">
-    <button class="viewer-close" id="viewerClose">×</button>
     <div class="viewer-content" id="viewerContent">
       <img class="viewer-img" id="viewerImg" src="">
     </div>
-    <button class="viewer-prev" id="viewerPrev">‹</button>
-    <button class="viewer-next" id="viewerNext">›</button>
   </div>
 
   <div class="modal" id="deleteModal">
