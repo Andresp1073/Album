@@ -192,16 +192,6 @@ document.addEventListener("keydown", (e) => {
     closeViewer()
   }
 })
-    if (confirmModal.style.display === "flex") {
-      confirmModal.style.display = "none"
-      return
-    }
-
-    if (viewerModal.style.display === "flex") {
-      closeViewer()
-    }
-  }
-})
 
 async function loadAlbum() {
   const { data, error } = await window.supabaseClient
