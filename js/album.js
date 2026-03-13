@@ -9,6 +9,10 @@ const statusText = document.getElementById("statusText")
 
 const viewerModal = document.getElementById("viewerModal")
 const viewerContent = document.getElementById("viewerContent")
+const viewerMenuBtn = document.getElementById("viewerMenuBtn")
+const viewerMenu = document.getElementById("viewerMenu")
+const shareBtn = document.getElementById("shareBtn")
+const deleteViewerBtn = document.getElementById("deleteViewerBtn")
 
 const confirmModal = document.getElementById("confirmModal")
 const confirmYesBtn = document.getElementById("confirmYesBtn")
@@ -84,6 +88,39 @@ viewerModal.addEventListener("click", (e) => {
   if (e.target === viewerModal) {
     closeViewer()
   }
+  viewerMenu.classList.remove("show")
+})
+
+viewerMenuBtn.addEventListener("click", (e) => {
+  e.stopPropagation()
+  viewerMenu.classList.toggle("show")
+})
+
+shareBtn.addEventListener("click", async () => {
+  const item = currentMediaList[currentViewerIndex]
+  if (!item) return
+  const url = await getSignedFileUrl(item.file_path)
+  if (!url) return
+  if (navigator.share) {
+    try {
+      if (item.file_type === "image") {
+        const response = await fetch(url)
+        const blob = await response.blob()
+        const file = new File([blob], "foto.jpg", { type: "image/jpeg" })
+        await navigator.share({ files: [file] })
+      } else {
+        await navigator.share({ url, title: "Video" })
+      }
+    } catch (e) {}
+  } else {
+    window.open(url, "_blank")
+  }
+  viewerMenu.classList.remove("show")
+})
+
+deleteViewerBtn.addEventListener("click", () => {
+  viewerMenu.classList.remove("show")
+  confirmModal.style.display = "flex"
 })
 
 let viewerTouchStartX = 0
