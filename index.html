@@ -1,65 +1,39 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Nuestro Álbum</title>
-
-<link rel="stylesheet" href="css/style.css">
-
-<link rel="manifest" href="/manifest.json">
-<meta name="theme-color" content="#d63384">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="Álbum">
-<link rel="apple-touch-icon" href="/icons/icon-192.png">
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nuestro Álbum</title>
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#d63384">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Álbum">
+  <link rel="apple-touch-icon" href="/icons/icon-192.png">
+  <style>
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Arial,Helvetica,sans-serif;background:linear-gradient(135deg,#ffe4ec,#fff0f6);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+    .login-card{background:white;border-radius:24px;padding:40px 30px;max-width:380px;width:100%;box-shadow:0 20px 60px rgba(214,51,132,0.15);text-align:center}
+    .login-card h1{margin:0 0 8px;color:#d63384;font-size:1.8rem}
+    .login-card p{margin:0 0 30px;color:#7a4a63;font-size:0.95rem}
+    .login-card input{width:100%;padding:14px 16px;border-radius:14px;border:1px solid #f3bfd4;margin-bottom:14px;font-size:15px;outline:none;transition:border-color 0.2s}
+    .login-card input:focus{border-color:#ff7ab8}
+    .login-card button{width:100%;padding:14px;border-radius:14px;border:none;background:#ff6fae;color:white;font-size:16px;font-weight:bold;cursor:pointer;transition:transform 0.2s,box-shadow 0.2s}
+    .login-card button:hover{transform:translateY(-2px);box-shadow:0 10px 25px rgba(255,111,174,0.3)}
+  </style>
 </head>
-
 <body>
-
-<div class="background-hearts"></div>
-
-<div class="login-container">
   <div class="login-card">
-
     <h1>Nuestro Álbum 💖</h1>
-
-    <p class="subtitle">
-      Un lugar especial para guardar nuestros recuerdos
-    </p>
-
+    <p>Ingresa para ver tus recuerdos</p>
     <form id="loginForm">
-
-      <input 
-        id="email"
-        type="email" 
-        placeholder="Correo" 
-        required
-      >
-
-      <input 
-        id="password"
-        type="password" 
-        placeholder="Contraseña"
-        required
-      >
-
-      <button type="submit">
-        Entrar
-      </button>
-
+      <input id="email" type="email" placeholder="Correo" required>
+      <input id="password" type="password" placeholder="Contraseña" required>
+      <button type="submit">Entrar</button>
     </form>
-
   </div>
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/supabaseClient.js"></script>
-<script src="js/app.js"></script>
-<script src="js/pwa.js"></script>
-
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabaseClient.js"></script>
+  <script src="js/app.js"></script>
 </body>
 </html>

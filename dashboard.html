@@ -3,270 +3,54 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
   <title>Nuestros Álbumes</title>
-
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#d63384">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="Álbum">
   <link rel="apple-touch-icon" href="/icons/icon-192.png">
-
   <style>
-    body{
-      margin:0;
-      font-family:Arial, Helvetica, sans-serif;
-      background:linear-gradient(135deg,#fff0f6,#ffe4ec);
-      min-height:100vh;
-      color:#4a2340;
-    }
-
-    .albums-container{
-      max-width:1100px;
-      margin:auto;
-      padding:30px 20px 60px;
-    }
-
-    .topbar{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:12px;
-      flex-wrap:wrap;
-      margin-bottom:24px;
-    }
-
-    .title-block h1{
-      margin:0;
-      color:#d63384;
-      font-size:2rem;
-    }
-
-    .title-block p{
-      margin:8px 0 0;
-      color:#7a4a63;
-    }
-
-    .actions{
-      display:flex;
-      gap:12px;
-      flex-wrap:wrap;
-    }
-
-    .btn{
-      border:none;
-      padding:12px 18px;
-      border-radius:12px;
-      cursor:pointer;
-      font-size:15px;
-      font-weight:bold;
-      transition:.25s ease;
-      text-decoration:none;
-      display:inline-block;
-    }
-
-    .btn-primary{
-      background:#ff6fae;
-      color:white;
-      box-shadow:0 10px 20px rgba(214,51,132,.18);
-    }
-
-    .btn-secondary{
-      background:white;
-      color:#d63384;
-      border:1px solid #ffd0e2;
-    }
-
-    .btn-danger{
-      background:#e63946;
-      color:white;
-    }
-
-    .btn:hover{
-      transform:translateY(-1px);
-    }
-
-    .album-grid{
-      display:grid;
-      grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
-      gap:18px;
-    }
-
-    .album-card{
-      background:white;
-      border-radius:20px;
-      padding:22px 18px;
-      box-shadow:0 10px 24px rgba(0,0,0,.08);
-      position:relative;
-      min-height:130px;
-      display:flex;
-      flex-direction:column;
-      justify-content:flex-end;
-      cursor:pointer;
-    }
-
-    .album-cover{
-      position:absolute;
-      inset:0;
-      background:linear-gradient(135deg,#fff,#fff7fb);
-      border-radius:20px;
-      border:1px solid #ffe0ec;
-      background-size:cover;
-      background-position:center;
-      background-repeat:no-repeat;
-    }
-
-    .album-content{
-      position:relative;
-      z-index:1;
-    }
-
-    .album-name{
-      font-size:1.05rem;
-      font-weight:bold;
-      color:#d63384;
-      word-break:break-word;
-      margin-bottom:8px;
-    }
-
-    .album-date{
-      font-size:.9rem;
-      color:#8b6077;
-    }
-
-    .menu-wrap{
-      position:absolute;
-      top:12px;
-      right:12px;
-      z-index:4;
-    }
-
-    .menu-btn{
-      border:none;
-      background:transparent;
-      cursor:pointer;
-      font-size:20px;
-      color:#d63384;
-    }
-
-    .menu-dropdown{
-      display:none;
-      position:absolute;
-      top:46px;
-      right:0;
-      min-width:170px;
-      background:white;
-      border-radius:14px;
-      box-shadow:0 14px 28px rgba(0,0,0,.18);
-      overflow:hidden;
-      border:1px solid #ffd9e8;
-    }
-
-    .menu-dropdown.open{
-      display:block;
-    }
-
-    .menu-dropdown button{
-      width:100%;
-      display:block;
-      border:none;
-      background:white;
-      color:#d63384;
-      padding:14px 16px;
-      text-align:left;
-      cursor:pointer;
-      font-size:14px;
-      font-weight:700;
-    }
-
-    .menu-dropdown button:hover{
-      background:#fff2f7;
-    }
-
-    .empty-state{
-      background:white;
-      border-radius:20px;
-      padding:32px 20px;
-      text-align:center;
-      color:#7a4a63;
-      box-shadow:0 10px 24px rgba(0,0,0,.06);
-    }
-
-    .modal{
-      position:fixed;
-      inset:0;
-      background:rgba(20, 10, 18, .58);
-      display:none;
-      align-items:center;
-      justify-content:center;
-      z-index:1000;
-      padding:20px;
-    }
-
-    .modal-card{
-      width:min(100%, 430px);
-      background:white;
-      border-radius:20px;
-      padding:24px;
-      box-shadow:0 18px 42px rgba(0,0,0,.22);
-      text-align:center;
-    }
-
-    .modal-card h3{
-      margin-top:0;
-      color:#d63384;
-    }
-
-    .modal-card p{
-      color:#6f4960;
-      line-height:1.6;
-      margin-bottom:20px;
-    }
-
-    .modal-card input{
-      width:100%;
-      box-sizing:border-box;
-      padding:14px;
-      border-radius:12px;
-      border:1px solid #f1c5d9;
-      margin-bottom:10px;
-      font-size:15px;
-      outline:none;
-    }
-
-    .modal-error{
-      min-height:20px;
-      font-size:.9rem;
-      color:#e63946;
-      margin-bottom:14px;
-    }
-
-    .modal-actions{
-      display:flex;
-      gap:12px;
-      justify-content:center;
-      flex-wrap:wrap;
-    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Arial,Helvetica,sans-serif;background:linear-gradient(135deg,#fff0f6,#ffe4ec);min-height:100vh;color:#4a2340}
+    .container{max-width:1100px;margin:0 auto;padding:20px}
+    .header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:24px}
+    .header h1{margin:0;color:#d63384;font-size:1.8rem}
+    .header-buttons{display:flex;gap:8px;flex-wrap:wrap}
+    .btn{padding:10px 16px;border:none;border-radius:12px;cursor:pointer;font-size:14px;font-weight:bold;text-decoration:none;display:inline-block}
+    .btn-primary{background:#ff6fae;color:white}
+    .btn-secondary{background:white;color:#d63384;border:1px solid #ffd0e2}
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px}
+    .card{background:white;border-radius:16px;padding:12px;box-shadow:0 4px 12px rgba(0,0,0,0.08);position:relative;cursor:pointer}
+    .card-cover{width:100%;height:120px;border-radius:12px;background:linear-gradient(135deg,#fff,#fff7fb);border:1px solid #ffe0ec;background-size:cover;background-position:center;margin-bottom:10px}
+    .card-title{font-size:1rem;font-weight:bold;color:#d63384;margin-bottom:4px}
+    .card-date{font-size:0.85rem;color:#8b6077}
+    .menu{position:absolute;top:8px;right:8px;z-index:10}
+    .menu-btn{border:none;background:transparent;font-size:22px;cursor:pointer;padding:4px 8px;color:#d63384}
+    .menu-dropdown{display:none;position:absolute;top:36px;right:0;min-width:140px;background:white;border-radius:12px;box-shadow:0 8px 20px rgba(0,0,0,0.15);border:1px solid #ffd9e8;z-index:20}
+    .menu-dropdown.show{display:block}
+    .menu-dropdown button{width:100%;border:none;background:white;color:#d63384;padding:12px;text-align:left;cursor:pointer;font-size:14px;font-weight:bold}
+    .menu-dropdown button:hover{background:#fff2f7}
+    .empty{background:white;border-radius:16px;padding:40px 20px;text-align:center;color:#7a4a63}
+    .modal{position:fixed;inset:0;background:rgba(20,10,18,0.5);display:none;align-items:center;justify-content:center;z-index:1000;padding:20px}
+    .modal-card{background:white;border-radius:16px;padding:24px;max-width:400px;width:100%;text-align:center}
+    .modal-card h3{margin:0 0 16px;color:#d63384}
+    .modal-card input{width:100%;padding:12px;border-radius:10px;border:1px solid #f1c5d9;margin-bottom:12px;font-size:15px;box-sizing:border-box}
+    .modal-error{color:#e63946;font-size:14px;margin-bottom:12px;min-height:20px}
+    .modal-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
   </style>
 </head>
-
 <body>
-
-  <div class="albums-container">
-    <div class="topbar">
-      <div class="title-block">
-        <h1>Nuestros Álbumes 💖</h1>
-      </div>
-
-      <div class="actions">
-        <button class="btn btn-primary" id="createAlbum">Crear álbum</button>
-        <a class="btn btn-secondary" href="trash.html">Papelera</a>
-        <button class="btn btn-secondary" id="logoutBtn">Cerrar sesión</button>
+  <div class="container">
+    <div class="header">
+      <h1>Nuestros Álbumes 💖</h1>
+      <div class="header-buttons">
+        <button class="btn btn-primary" id="createAlbum">+ Nuevo</button>
+        <a class="btn btn-secondary" href="trash.html">🗑️</a>
+        <button class="btn btn-secondary" id="logoutBtn">Salir</button>
       </div>
     </div>
-
-    <div class="album-grid" id="albumGrid"></div>
+    <div class="grid" id="albumGrid"></div>
   </div>
 
   <div class="modal" id="createModal">
@@ -295,10 +79,9 @@
 
   <div class="modal" id="deleteModal">
     <div class="modal-card">
-      <h3>¿Deseas eliminar este álbum?</h3>
-      <p>Esta acción eliminará el álbum de tu lista.</p>
+      <h3>¿Eliminar álbum?</h3>
       <div class="modal-actions">
-        <button class="btn btn-danger" id="confirmDeleteBtn">Sí, eliminar</button>
+        <button class="btn btn-primary" style="background:#e63946" id="confirmDeleteBtn">Sí</button>
         <button class="btn btn-secondary" id="cancelDeleteBtn">No</button>
       </div>
     </div>
@@ -307,7 +90,5 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabaseClient.js"></script>
   <script src="js/albums.js"></script>
-  <script src="js/pwa.js"></script>
-
 </body>
 </html>

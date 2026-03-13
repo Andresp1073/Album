@@ -247,9 +247,9 @@ function renderAlbums(albums) {
 
   if (!albums.length) {
     grid.innerHTML = `
-      <div class="empty-state" style="grid-column:1/-1;">
+      <div class="empty" style="grid-column:1/-1;">
         <h3 style="margin-top:0;color:#d63384;">Aún no hay álbumes</h3>
-        <p>Crea el primero para empezar a guardar sus recuerdos 💕</p>
+        <p>Crea el primero para empezar 💕</p>
       </div>
     `
     return
@@ -257,7 +257,7 @@ function renderAlbums(albums) {
 
   albums.forEach((album) => {
     const card = document.createElement("div")
-    card.className = "album-card"
+    card.className = "card"
 
     const date = new Date(album.created_at).toLocaleDateString("es-CO", {
       year: "numeric",
@@ -266,55 +266,48 @@ function renderAlbums(albums) {
     })
 
     const menuWrap = document.createElement("div")
-    menuWrap.className = "menu-wrap"
+    menuWrap.className = "menu"
 
     const menuBtn = document.createElement("button")
     menuBtn.className = "menu-btn"
     menuBtn.type = "button"
-    menuBtn.textContent = "⋮"
+    menuBtn.innerHTML = "⋮"
 
     const dropdown = document.createElement("div")
     dropdown.className = "menu-dropdown"
 
     const editBtn = document.createElement("button")
-    editBtn.type = "button"
-    editBtn.className = "edit-album-btn"
     editBtn.textContent = "Editar"
+    editBtn.onclick = (e) => { e.stopPropagation(); dropdown.classList.remove("show"); openEditModal(album.id, album.name) }
 
     const deleteBtn = document.createElement("button")
-    deleteBtn.type = "button"
-    deleteBtn.className = "delete-album-btn"
     deleteBtn.textContent = "Eliminar"
+    deleteBtn.onclick = (e) => { e.stopPropagation(); dropdown.classList.remove("show"); openDeleteModal(album.id, album.name) }
 
     dropdown.appendChild(editBtn)
     dropdown.appendChild(deleteBtn)
     menuWrap.appendChild(menuBtn)
     menuWrap.appendChild(dropdown)
 
-    const content = document.createElement("div")
-    content.className = "album-content"
-
     const coverEl = document.createElement("div")
-    coverEl.className = "album-cover"
+    coverEl.className = "card-cover"
 
     if (album.cover_url) {
       coverEl.style.backgroundImage = `url("${album.cover_url}")`
-      coverEl.setAttribute("aria-label", `Portada del álbum ${album.name}`)
     }
 
-    const nameEl = document.createElement("div")
-    nameEl.className = "album-name"
-    nameEl.textContent = album.name
+    const titleEl = document.createElement("div")
+    titleEl.className = "card-title"
+    titleEl.textContent = album.name
 
     const dateEl = document.createElement("div")
-    dateEl.className = "album-date"
-    dateEl.textContent = `Creado: ${date}`
+    dateEl.className = "card-date"
+    dateEl.textContent = date
 
-    content.appendChild(nameEl)
-    content.appendChild(dateEl)
-    card.appendChild(content)
-    card.appendChild(coverEl)
     card.appendChild(menuWrap)
+    card.appendChild(coverEl)
+    card.appendChild(titleEl)
+    card.appendChild(dateEl)
 
     card.addEventListener("click", () => {
       window.location.href = `album.html?id=${album.id}`
@@ -322,12 +315,10 @@ function renderAlbums(albums) {
 
     menuBtn.addEventListener("click", (e) => {
       e.stopPropagation()
-
       document.querySelectorAll(".menu-dropdown").forEach((item) => {
-        if (item !== dropdown) item.classList.remove("open")
+        if (item !== dropdown) item.classList.remove("show")
       })
-
-      dropdown.classList.toggle("open")
+      dropdown.classList.toggle("show")
     })
 
     editBtn.addEventListener("click", (e) => {
