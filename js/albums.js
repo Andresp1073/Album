@@ -55,12 +55,22 @@ async function getSignedFileUrl(filePath) {
   return data.signedUrl
 }
 
+const savedTab = localStorage.getItem("active_tab") || "fotos"
+
+document.querySelectorAll(".tab").forEach(tab => {
+  if (tab.dataset.tab === savedTab) {
+    tab.classList.add("active")
+    document.getElementById("section-" + savedTab).classList.add("active")
+  }
+})
+
 document.querySelectorAll(".tab").forEach(tab => {
   tab.addEventListener("click", () => {
     document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"))
     document.querySelectorAll(".section").forEach(s => s.classList.remove("active"))
     tab.classList.add("active")
     document.getElementById("section-" + tab.dataset.tab).classList.add("active")
+    localStorage.setItem("active_tab", tab.dataset.tab)
   })
 })
 
@@ -284,11 +294,21 @@ function renderAllPhotos() {
         img.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect fill='%23f8f1f5' width='100' height='100'/%3E%3Ctext fill='%23b88aa8' x='50' y='50' text-anchor='middle' dy='.3em'%3E📷%3C/text%3E%3C/svg%3E"
       }
       card.appendChild(img)
-    } else if (item.file_type === "video") {
+    } else if (item.file_type === "video" && signedUrl) {
+      const video = document.createElement("video")
+      video.className = "photo-img"
+      video.src = signedUrl
+      video.muted = true
+      video.playsInline = true
+      video.preload = "metadata"
+      const playIcon = document.createElement("div")
+      playIcon.style.cssText = "position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:28px;pointer-events:none"
+      playIcon.innerHTML = "▶️"
       const wrapper = document.createElement("div")
       wrapper.className = "photo-img"
-      wrapper.style.cssText = "display:flex;align-items:center;justify-content:center;background:#f8f1f5"
-      wrapper.innerHTML = `<span style="font-size:30px">🎬</span>`
+      wrapper.style.position = "relative"
+      wrapper.appendChild(video)
+      wrapper.appendChild(playIcon)
       card.appendChild(wrapper)
     }
 
