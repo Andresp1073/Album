@@ -23,11 +23,29 @@ const viewerModal = document.getElementById("viewerModal")
 const viewerImg = document.getElementById("viewerImg")
 
 let currentPhotoIndex = 0
-
 let selectedAlbumId = null
 let selectedAlbumName = ""
 let currentUserId = null
 let allMedia = []
+const urlCache = new Map()
+
+async function getSignedFileUrl(filePath) {
+  if (urlCache.has(filePath)) {
+    return urlCache.get(filePath)
+  }
+  
+  const { data, error } = await window.supabaseClient.storage
+    .from("album-media")
+    .createSignedUrl(filePath, 3600)
+
+  if (error || !data?.signedUrl) {
+    console.error("Error generando signed URL:", error)
+    return null
+  }
+
+  urlCache.set(filePath, data.signedUrl)
+  return data.signedUrl
+}
 
 document.querySelectorAll(".tab").forEach(tab => {
   tab.addEventListener("click", () => {
@@ -39,10 +57,15 @@ document.querySelectorAll(".tab").forEach(tab => {
 })
 
 document.addEventListener("DOMContentLoaded", async () => {
+  const savedSession = localStorage.getItem("supabase_session")
+  if (!savedSession) {
+    window.location.href = "index.html"
+    return
+  }
+
   const { data, error } = await window.supabaseClient.auth.getUser()
 
   if (error || !data.user) {
-    alert("Sesión no válida. Vuelve a iniciar sesión.")
     window.location.href = "index.html"
     return
   }
@@ -53,8 +76,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 })
 
 logoutBtn.addEventListener("click", async () => {
-  await window.supabaseClient.auth.signOut()
-  window.location.href = "index.html"
+  if (confirm("¿Cerrar sesión?")) {
+    await window.supabaseClient.auth.signOut()
+    localStorage.removeItem("supabase_session")
+    window.location.href = "index.html"
+  }
 })
 
 createBtn.addEventListener("click", () => {
@@ -79,7 +105,6 @@ deleteModal.addEventListener("click", (e) => {
 
 saveCreateBtn.addEventListener("click", async () => {
   const name = createAlbumInput.value.trim()
-
   if (!name) {
     createAlbumError.textContent = "Escribe un nombre para el álbum."
     return
@@ -100,18 +125,12 @@ saveCreateBtn.addEventListener("click", async () => {
 
   const { error } = await window.supabaseClient
     .from("albums")
-    .insert([
-      {
-        name,
-        user_id: userId
-      }
-    ])
+    .insert([{ name, user_id: userId }])
 
   saveCreateBtn.disabled = false
 
   if (error) {
     createAlbumError.textContent = error.message
-    console.error(error)
     return
   }
 
@@ -121,7 +140,6 @@ saveCreateBtn.addEventListener("click", async () => {
 
 saveEditBtn.addEventListener("click", async () => {
   const newName = editAlbumInput.value.trim()
-
   if (!newName) {
     editAlbumError.textContent = "Escribe un nombre válido."
     return
@@ -139,7 +157,6 @@ saveEditBtn.addEventListener("click", async () => {
 
   if (error) {
     editAlbumError.textContent = error.message
-    console.error(error)
     return
   }
 
@@ -150,36 +167,19 @@ saveEditBtn.addEventListener("click", async () => {
 confirmDeleteBtn.addEventListener("click", async () => {
   confirmDeleteBtn.disabled = true
 
-  await window.supabaseClient
-    .from("media")
-    .delete()
-    .eq("album_id", selectedAlbumId)
+  await window.supabaseClient.from("media").delete().eq("album_id", selectedAlbumId)
 
-  const { error } = await window.supabaseClient
-    .from("albums")
-    .delete()
-    .eq("id", selectedAlbumId)
+  const { error } = await window.supabaseClient.from("albums").delete().eq("id", selectedAlbumId)
 
   confirmDeleteBtn.disabled = false
 
   if (error) {
     alert("Error eliminando álbum: " + error.message)
-    console.error(error)
     return
   }
 
   closeDeleteModal()
   await loadAlbums()
-})
-
-document.addEventListener("click", (e) => {
-  const allDropdowns = document.querySelectorAll(".menu-dropdown")
-  allDropdowns.forEach((dropdown) => {
-    const wrap = dropdown.closest(".menu-wrap")
-    if (wrap && !wrap.contains(e.target)) {
-      dropdown.classList.remove("open")
-    }
-  })
 })
 
 document.addEventListener("keydown", (e) => {
@@ -246,7 +246,6 @@ function openViewer(index) {
 function updateViewerImage() {
   const item = allMedia[currentPhotoIndex]
   if (!item) return
-
   getSignedFileUrl(item.file_path).then(url => {
     if (url) viewerImg.src = url
   })
@@ -289,11 +288,8 @@ viewerModal.addEventListener("touchend", (e) => {
   const diffY = endY - viewerTouchStartY
   
   if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 30) {
-    if (diffX > 0) {
-      showPrev()
-    } else {
-      showNext()
-    }
+    if (diffX > 0) showPrev()
+    else showNext()
   } else if (diffY > 50) {
     closeViewer()
   }
@@ -303,16 +299,11 @@ document.addEventListener("keydown", (e) => {
   if (!viewerModal.classList.contains("show")) return
   if (e.key === "ArrowLeft") showPrev()
   if (e.key === "ArrowRight") showNext()
-  if (e.key === "Escape") closeViewer()
 })
 
 async function loadAlbums() {
-  const { data: authData, error: authError } = await window.supabaseClient.auth.getUser()
-
-  if (authError || !authData.user) {
-    alert("No se pudo obtener el usuario autenticado.")
-    return
-  }
+  const { data: authData } = await window.supabaseClient.auth.getUser()
+  if (!authData?.user) return
 
   const userId = authData.user.id
 
@@ -322,22 +313,17 @@ async function loadAlbums() {
     .eq("user_id", userId)
     .order("created_at", { ascending: true })
 
-  if (albumsError) {
-    alert("Error cargando álbumes: " + albumsError.message)
-    console.error(albumsError)
-    return
-  }
+  if (albumsError) return
 
   const albumsList = albums || []
-
   if (!albumsList.length) {
     renderAlbums([])
     return
   }
 
-  const albumIds = albumsList.map((album) => album.id)
+  const albumIds = albumsList.map(album => album.id)
 
-  const { data: mediaItems, error: mediaError } = await window.supabaseClient
+  const { data: mediaItems } = await window.supabaseClient
     .from("media")
     .select("album_id, file_path, created_at")
     .in("album_id", albumIds)
@@ -346,14 +332,7 @@ async function loadAlbums() {
     .eq("is_deleted", false)
     .order("created_at", { ascending: true })
 
-  if (mediaError) {
-    alert("Error cargando portadas de álbumes: " + mediaError.message)
-    console.error(mediaError)
-    return
-  }
-
   const firstImageByAlbum = {}
-
   for (const item of mediaItems || []) {
     if (!firstImageByAlbum[item.album_id]) {
       firstImageByAlbum[item.album_id] = item
@@ -361,20 +340,17 @@ async function loadAlbums() {
   }
 
   const coverUrlByAlbum = {}
-
   for (const album of albumsList) {
     const firstImage = firstImageByAlbum[album.id]
-
     if (!firstImage) {
       coverUrlByAlbum[album.id] = null
       continue
     }
-
     const signedUrl = await getSignedFileUrl(firstImage.file_path)
     coverUrlByAlbum[album.id] = signedUrl || null
   }
 
-  const albumsWithCover = albumsList.map((album) => ({
+  const albumsWithCover = albumsList.map(album => ({
     ...album,
     cover_url: coverUrlByAlbum[album.id] || null
   }))
@@ -386,24 +362,15 @@ function renderAlbums(albums) {
   grid.innerHTML = ""
 
   if (!albums.length) {
-    grid.innerHTML = `
-      <div class="empty" style="grid-column:1/-1;">
-        <h3 style="margin-top:0;color:#d63384;">Aún no hay álbumes</h3>
-        <p>Crea el primero para empezar 💕</p>
-      </div>
-    `
+    grid.innerHTML = `<div class="empty"><h3 style="margin-top:0;color:#d63384;">Aún no hay álbumes</h3><p>Crea el primero para empezar 💕</p></div>`
     return
   }
 
-  albums.forEach((album) => {
+  albums.forEach(album => {
     const card = document.createElement("div")
     card.className = "card"
 
-    const date = new Date(album.created_at).toLocaleDateString("es-CO", {
-      year: "numeric",
-      month: "short",
-      day: "numeric"
-    })
+    const date = new Date(album.created_at).toLocaleDateString("es-CO", { year: "numeric", month: "short", day: "numeric" })
 
     const menuWrap = document.createElement("div")
     menuWrap.className = "menu"
@@ -431,7 +398,6 @@ function renderAlbums(albums) {
 
     const coverEl = document.createElement("div")
     coverEl.className = "card-cover"
-
     if (album.cover_url) {
       coverEl.style.backgroundImage = `url("${album.cover_url}")`
     }
@@ -455,7 +421,7 @@ function renderAlbums(albums) {
 
     menuBtn.addEventListener("click", (e) => {
       e.stopPropagation()
-      document.querySelectorAll(".menu-dropdown").forEach((item) => {
+      document.querySelectorAll(".menu-dropdown").forEach(item => {
         if (item !== dropdown) item.classList.remove("show")
       })
       dropdown.classList.toggle("show")
@@ -475,13 +441,10 @@ function openCreateModal() {
   createAlbumInput.value = ""
   createAlbumError.textContent = ""
   createModal.style.display = "flex"
-  setTimeout(() => createAlbumInput.focus(), 0)
 }
 
 function closeCreateModal() {
   createModal.style.display = "none"
-  createAlbumInput.value = ""
-  createAlbumError.textContent = ""
 }
 
 function openEditModal(id, name) {
@@ -490,15 +453,10 @@ function openEditModal(id, name) {
   editAlbumInput.value = name
   editAlbumError.textContent = ""
   editModal.style.display = "flex"
-  setTimeout(() => editAlbumInput.focus(), 0)
 }
 
 function closeEditModal() {
   editModal.style.display = "none"
-  editAlbumInput.value = ""
-  editAlbumError.textContent = ""
-  selectedAlbumId = null
-  selectedAlbumName = ""
 }
 
 function openDeleteModal(id, name) {
@@ -511,17 +469,4 @@ function closeDeleteModal() {
   deleteModal.style.display = "none"
   selectedAlbumId = null
   selectedAlbumName = ""
-}
-
-async function getSignedFileUrl(filePath) {
-  const { data, error } = await window.supabaseClient.storage
-    .from("album-media")
-    .createSignedUrl(filePath, 3600)
-
-  if (error || !data?.signedUrl) {
-    console.error("Error generando signed URL para portada:", error)
-    return null
-  }
-
-  return data.signedUrl
 }
