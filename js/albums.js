@@ -19,6 +19,16 @@ const deleteModal = document.getElementById("deleteModal")
 const confirmDeleteBtn = document.getElementById("confirmDeleteBtn")
 const cancelDeleteBtn = document.getElementById("cancelDeleteBtn")
 
+const viewerModal = document.getElementById("viewerModal")
+const viewerImg = document.getElementById("viewerImg")
+const viewerClose = document.getElementById("viewerClose")
+const viewerPrev = document.getElementById("viewerPrev")
+const viewerNext = document.getElementById("viewerNext")
+
+let currentPhotoIndex = 0
+let touchStartX = 0
+let touchEndX = 0
+
 let selectedAlbumId = null
 let selectedAlbumName = ""
 let currentUserId = null
@@ -182,6 +192,7 @@ document.addEventListener("keydown", (e) => {
     closeCreateModal()
     closeEditModal()
     closeDeleteModal()
+    closeViewer()
   }
 })
 
@@ -210,7 +221,7 @@ function renderAllPhotos() {
     return
   }
 
-  allMedia.forEach(async (item) => {
+  allMedia.forEach(async (item, index) => {
     const card = document.createElement("div")
     card.className = "card photo-card"
 
@@ -221,6 +232,7 @@ function renderAllPhotos() {
     const signedUrl = await getSignedFileUrl(item.file_path)
     if (signedUrl) {
       img.src = signedUrl
+      card.addEventListener("click", () => openViewer(index))
     } else {
       img.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect fill='%23f8f1f5' width='100' height='100'/%3E%3Ctext fill='%23b88aa8' x='50' y='50' text-anchor='middle' dy='.3em'%3E📷%3C/text%3E%3C/svg%3E"
     }
@@ -229,6 +241,71 @@ function renderAllPhotos() {
     allPhotosGrid.appendChild(card)
   })
 }
+
+function openViewer(index) {
+  currentPhotoIndex = index
+  updateViewerImage()
+  viewerModal.classList.add("show")
+}
+
+function updateViewerImage() {
+  const item = allMedia[currentPhotoIndex]
+  if (!item) return
+
+  getSignedFileUrl(item.file_path).then(url => {
+    if (url) viewerImg.src = url
+  })
+}
+
+function closeViewer() {
+  viewerModal.classList.remove("show")
+}
+
+function showPrev() {
+  if (currentPhotoIndex > 0) {
+    currentPhotoIndex--
+    updateViewerImage()
+  }
+}
+
+function showNext() {
+  if (currentPhotoIndex < allMedia.length - 1) {
+    currentPhotoIndex++
+    updateViewerImage()
+  }
+}
+
+viewerClose.addEventListener("click", closeViewer)
+viewerPrev.addEventListener("click", showPrev)
+viewerNext.addEventListener("click", showNext)
+
+viewerModal.addEventListener("click", (e) => {
+  if (e.target === viewerModal) closeViewer()
+})
+
+viewerModal.addEventListener("touchstart", (e) => {
+  touchStartX = e.changedTouches[0].screenX
+})
+
+viewerModal.addEventListener("touchend", (e) => {
+  touchEndX = e.changedTouches[0].screenX
+  handleSwipe()
+})
+
+function handleSwipe() {
+  const swipeThreshold = 50
+  if (touchEndX < touchStartX - swipeThreshold) {
+    showNext()
+  } else if (touchEndX > touchStartX + swipeThreshold) {
+    showPrev()
+  }
+}
+
+document.addEventListener("keydown", (e) => {
+  if (!viewerModal.classList.contains("show")) return
+  if (e.key === "ArrowLeft") showPrev()
+  if (e.key === "ArrowRight") showNext()
+})
 
 async function loadAlbums() {
   const { data: authData, error: authError } = await window.supabaseClient.auth.getUser()

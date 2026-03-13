@@ -48,6 +48,14 @@
     .modal-card input{width:100%;padding:12px;border-radius:10px;border:1px solid #f1c5d9;margin-bottom:12px;font-size:15px;box-sizing:border-box}
     .modal-error{color:#e63946;font-size:14px;margin-bottom:12px;min-height:20px}
     .modal-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+    .viewer-modal{position:fixed;inset:0;background:rgba(0,0,0,0.95);display:none;align-items:center;justify-content:center;z-index:2000}
+    .viewer-modal.show{display:flex}
+    .viewer-close{position:absolute;top:20px;right:20px;width:44px;height:44px;border:none;border-radius:50%;background:rgba(255,255,255,0.2);color:white;font-size:24px;cursor:pointer;z-index:10}
+    .viewer-content{width:100%;height:100%;display:flex;align-items:center;justify-content:center;padding:40px}
+    .viewer-img{max-width:100%;max-height:100%;object-fit:contain}
+    .viewer-prev,.viewer-next{position:absolute;top:50%;transform:translateY(-50%);width:50px;height:50px;border:none;border-radius:50%;background:rgba(255,255,255,0.2);color:white;font-size:30px;cursor:pointer}
+    .viewer-prev{left:10px}
+    .viewer-next{right:10px}
     @media (min-width:600px){
       .grid{grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:16px}
       .photo-grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px}
@@ -102,6 +110,15 @@
         <button class="btn btn-secondary" id="cancelEditBtn">Cancelar</button>
       </div>
     </div>
+  </div>
+
+  <div class="viewer-modal" id="viewerModal">
+    <button class="viewer-close" id="viewerClose">×</button>
+    <div class="viewer-content" id="viewerContent">
+      <img class="viewer-img" id="viewerImg" src="">
+    </div>
+    <button class="viewer-prev" id="viewerPrev">‹</button>
+    <button class="viewer-next" id="viewerNext">›</button>
   </div>
 
   <div class="modal" id="deleteModal">
