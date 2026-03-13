@@ -1,4 +1,4 @@
-const CACHE_NAME = "album-v2"
+const CACHE_NAME = "album-v3"
 
 const urlsToCache = [
   "/",
