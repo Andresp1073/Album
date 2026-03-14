@@ -94,25 +94,28 @@ async function loadAlbums() {
     return []
   }
   
-  try {
-    const { data, error } = await window.supabaseClient.from('albums')
-      .select('*')
-      .eq('user_id', userId)
-      .eq('is_deleted', false)
-      .order('created_at', { ascending: false })
-    
-    if (error) {
-      console.error('Albums query error:', error)
-      return []
+  const tableNames = ['album', 'albums']
+  
+  for (const tableName of tableNames) {
+    try {
+      const { data, error } = await window.supabaseClient.from(tableName)
+        .select('*')
+        .eq('user_id', userId)
+        .eq('is_deleted', false)
+        .order('created_at', { ascending: false })
+      
+      if (!error && data) {
+        console.log('Albums loaded from:', tableName, data.length)
+        if (data.length > 0) await window.AlbumDB.saveAlbums(data)
+        return data
+      }
+    } catch (e) {
+      console.log('Try table:', tableName, e.message)
     }
-    
-    console.log('Albums loaded:', data?.length || 0)
-    if (data) await window.AlbumDB.saveAlbums(data)
-    return data || []
-  } catch (e) {
-    console.error('Load albums error:', e)
-    return await window.AlbumDB.getAlbums()
   }
+  
+  console.log('No albums table found, using local cache')
+  return await window.AlbumDB.getAlbums()
 }
 
 async function getUrl(item) {
@@ -157,7 +160,7 @@ async function remove(id) {
 }
 
 async function removeAlbum(id) {
-  const { error } = await window.supabaseClient.from('albums')
+  const { error } = await window.supabaseClient.from('album')
     .update({ is_deleted: true, deleted_at: new Date().toISOString() })
     .eq('id', id).eq('user_id', userId)
   
@@ -166,7 +169,7 @@ async function removeAlbum(id) {
 }
 
 async function addAlbum(name) {
-  const { data, error } = await window.supabaseClient.from('albums')
+  const { data, error } = await window.supabaseClient.from('album')
     .insert([{ name, user_id: userId }])
     .select().single()
   
