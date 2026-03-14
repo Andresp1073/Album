@@ -1,17 +1,15 @@
-import { initDB, saveMedia, getMedia, deleteMedia, saveAlbums, getAlbums, deleteAlbum, saveFile, getFile, hasFile } from './db.js'
-
 const SUPABASE_URL = "https://jodqkybcpxvqfxdqthfk.supabase.co"
 const SUPABASE_KEY = "sb_publishable_EClHgpUxwV7Bshxeva7fww_HejLA6OF"
 
 let supabase, userId
 
-export async function init() {
-  await initDB()
+async function initApp() {
+  await window.AlbumDB.initDB()
   supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
   window.supabaseClient = supabase
 }
 
-export async function checkAuth() {
+async function checkAuth() {
   const session = localStorage.getItem('supabase_session')
   if (!session) return false
   
@@ -22,7 +20,7 @@ export async function checkAuth() {
   return true
 }
 
-export function getUserId() {
+function getUserId() {
   return userId
 }
 
@@ -31,7 +29,7 @@ async function signedUrl(path) {
   return data?.signedUrl || null
 }
 
-export async function loadMedia(albumId = null) {
+async function loadMedia(albumId = null) {
   try {
     let query = supabase.from('media')
       .select('id, album_id, file_path, file_type, created_at')
@@ -42,14 +40,15 @@ export async function loadMedia(albumId = null) {
     if (albumId) query = query.eq('album_id', albumId)
     
     const { data } = await query
-    if (data) await saveMedia(data)
+    if (data) await window.AlbumDB.saveMedia(data)
     return data || []
   } catch (e) {
-    return await getMedia(albumId)
+    console.error('Error loading media:', e)
+    return await window.AlbumDB.getMedia(albumId)
   }
 }
 
-export async function loadAlbums() {
+async function loadAlbums() {
   try {
     const { data } = await supabase.from('albums')
       .select('*')
@@ -57,18 +56,19 @@ export async function loadAlbums() {
       .eq('is_deleted', false)
       .order('created_at', { ascending: false })
     
-    if (data) await saveAlbums(data)
+    if (data) await window.AlbumDB.saveAlbums(data)
     return data || []
   } catch (e) {
-    return await getAlbums()
+    console.error('Error loading albums:', e)
+    return await window.AlbumDB.getAlbums()
   }
 }
 
-export async function getUrl(item) {
+async function getUrl(item) {
   const path = item.file_path
   
-  if (await hasFile(path)) {
-    const blob = await getFile(path)
+  if (await window.AlbumDB.hasFile(path)) {
+    const blob = await window.AlbumDB.getFile(path)
     if (blob) return URL.createObjectURL(blob)
   }
   
@@ -77,42 +77,44 @@ export async function getUrl(item) {
     try {
       const res = await fetch(url)
       const blob = await res.blob()
-      await saveFile(path, blob)
+      await window.AlbumDB.saveFile(path, blob)
       return URL.createObjectURL(blob)
-    } catch (e) {}
+    } catch (e) {
+      console.error('Error caching file:', e)
+    }
   }
   
   return url
 }
 
-export async function remove(id) {
+async function remove(id) {
   const { error } = await supabase.from('media')
     .update({ is_deleted: true, deleted_at: new Date().toISOString() })
     .eq('id', id).eq('user_id', userId)
   
-  if (!error) await deleteMedia(id)
+  if (!error) await window.AlbumDB.deleteMedia(id)
   return !error
 }
 
-export async function removeAlbum(id) {
+async function removeAlbum(id) {
   const { error } = await supabase.from('albums')
     .update({ is_deleted: true, deleted_at: new Date().toISOString() })
     .eq('id', id).eq('user_id', userId)
   
-  if (!error) await deleteAlbum(id)
+  if (!error) await window.AlbumDB.deleteAlbum(id)
   return !error
 }
 
-export async function addAlbum(name) {
+async function addAlbum(name) {
   const { data, error } = await supabase.from('albums')
     .insert([{ name, user_id: userId }])
     .select().single()
   
-  if (!error && data) await saveAlbums([data])
+  if (!error && data) await window.AlbumDB.saveAlbums([data])
   return { data, error }
 }
 
-export async function upload(file, albumId) {
+async function uploadFile(file, albumId) {
   const name = `${Date.now()}_${file.name}`
   const type = file.type.startsWith('video') ? 'video' : 'image'
   
@@ -124,14 +126,18 @@ export async function upload(file, albumId) {
     .select().single()
   
   if (!error && data) {
-    await saveFile(name, file)
-    await saveMedia([data])
+    await window.AlbumDB.saveFile(name, file)
+    await window.AlbumDB.saveMedia([data])
   }
   
   return { data, error }
 }
 
-export async function logout() {
+async function logout() {
   await supabase.auth.signOut()
   localStorage.removeItem('supabase_session')
+}
+
+window.AlbumAPI = {
+  initApp, checkAuth, getUserId, loadMedia, loadAlbums, getUrl, remove, removeAlbum, addAlbum, uploadFile, logout
 }

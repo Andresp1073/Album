@@ -1,5 +1,3 @@
-import { init, checkAuth, loadMedia, getUrl, remove, removeAlbum, upload } from './api.js'
-
 const params = new URLSearchParams(window.location.search)
 const albumId = params.get('id')
 
@@ -18,7 +16,7 @@ document.getElementById('uploadBtn').onclick = () => document.getElementById('fi
 document.getElementById('fileInput').onchange = async (e) => {
   const files = Array.from(e.target.files)
   for (const file of files) {
-    await upload(file, albumId)
+    await window.AlbumAPI.uploadFile(file, albumId)
   }
   loadData()
   e.target.value = ''
@@ -41,7 +39,7 @@ viewer.onclick = (e) => {
 document.getElementById('vShare').onclick = async () => {
   const item = media[currentIndex]
   if (!item) return
-  const url = await getUrl(item)
+  const url = await window.AlbumAPI.getUrl(item)
   if (url && navigator.share) {
     try { await navigator.share({ url, title: 'Foto' }) } catch (e) {}
   }
@@ -57,7 +55,7 @@ document.getElementById('yesBtn').onclick = async () => {
   deleteModal.classList.remove('show')
   const item = media[currentIndex]
   if (item) {
-    await remove(item.id)
+    await window.AlbumAPI.remove(item.id)
     media = media.filter(m => m.id !== item.id)
     renderPhotos()
     if (media.length > 0) {
@@ -73,7 +71,7 @@ document.getElementById('noBtn').onclick = () => deleteModal.classList.remove('s
 
 document.getElementById('deleteBtn').onclick = async () => {
   if (confirm('¿Eliminar este álbum?')) {
-    await removeAlbum(albumId)
+    await window.AlbumAPI.removeAlbum(albumId)
     location.href = 'dashboard.html'
   }
 }
@@ -85,7 +83,7 @@ function closeViewer() {
 }
 
 async function loadData() {
-  media = await loadMedia(albumId)
+  media = await window.AlbumAPI.loadMedia(albumId)
   renderPhotos()
 }
 
@@ -100,7 +98,7 @@ function renderPhotos() {
     div.className = 'item'
     const img = document.createElement('img')
     img.loading = 'lazy'
-    getUrl(item).then(url => { if (url) img.src = url })
+    window.AlbumAPI.getUrl(item).then(url => { if (url) img.src = url })
     
     if (item.file_type === 'video') {
       const icon = document.createElement('div')
@@ -128,7 +126,7 @@ function showMedia(i) {
   vContent.innerHTML = ''
   if (!item) return
   
-  getUrl(item).then(url => {
+  window.AlbumAPI.getUrl(item).then(url => {
     if (!url) return
     if (item.file_type === 'video') {
       const video = document.createElement('video')
@@ -145,7 +143,8 @@ function showMedia(i) {
 }
 
 async function start() {
-  const ok = await checkAuth()
+  await window.AlbumAPI.initApp()
+  const ok = await window.AlbumAPI.checkAuth()
   if (!ok) {
     location.href = 'index.html'
     return

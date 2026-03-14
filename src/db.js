@@ -1,10 +1,9 @@
-// IndexedDB for offline storage
 const DB_NAME = 'AlbumApp'
 const DB_VERSION = 1
 
 let db = null
 
-export function initDB() {
+function initDB() {
   return new Promise((resolve, reject) => {
     const request = indexedDB.open(DB_NAME, DB_VERSION)
     request.onerror = () => reject(request.error)
@@ -27,16 +26,16 @@ export function initDB() {
   })
 }
 
-export async function saveMedia(items) {
-  if (!db) await initDB()
+function saveMedia(items) {
+  if (!db) return Promise.reject('DB not initialized')
   const tx = db.transaction('media', 'readwrite')
   const store = tx.objectStore('media')
   items.forEach(item => store.put(item))
   return new Promise(resolve => tx.oncomplete = resolve)
 }
 
-export async function getMedia(albumId = null) {
-  if (!db) await initDB()
+function getMedia(albumId = null) {
+  if (!db) return Promise.reject('DB not initialized')
   return new Promise((resolve, reject) => {
     const tx = db.transaction('media', 'readonly')
     const request = tx.objectStore('media').getAll()
@@ -49,23 +48,23 @@ export async function getMedia(albumId = null) {
   })
 }
 
-export async function deleteMedia(id) {
-  if (!db) await initDB()
+function deleteMedia(id) {
+  if (!db) return Promise.reject('DB not initialized')
   const tx = db.transaction('media', 'readwrite')
   tx.objectStore('media').delete(id)
   return new Promise(resolve => tx.oncomplete = resolve)
 }
 
-export async function saveAlbums(items) {
-  if (!db) await initDB()
+function saveAlbums(items) {
+  if (!db) return Promise.reject('DB not initialized')
   const tx = db.transaction('albums', 'readwrite')
   const store = tx.objectStore('albums')
   items.forEach(item => store.put(item))
   return new Promise(resolve => tx.oncomplete = resolve)
 }
 
-export async function getAlbums() {
-  if (!db) await initDB()
+function getAlbums() {
+  if (!db) return Promise.reject('DB not initialized')
   return new Promise((resolve, reject) => {
     const tx = db.transaction('albums', 'readonly')
     const request = tx.objectStore('albums').getAll()
@@ -74,22 +73,22 @@ export async function getAlbums() {
   })
 }
 
-export async function deleteAlbum(id) {
-  if (!db) await initDB()
+function deleteAlbum(id) {
+  if (!db) return Promise.reject('DB not initialized')
   const tx = db.transaction('albums', 'readwrite')
   tx.objectStore('albums').delete(id)
   return new Promise(resolve => tx.oncomplete = resolve)
 }
 
-export async function saveFile(path, blob) {
-  if (!db) await initDB()
+function saveFile(path, blob) {
+  if (!db) return Promise.reject('DB not initialized')
   const tx = db.transaction('files', 'readwrite')
   tx.objectStore('files').put({ path, blob, time: Date.now() })
   return new Promise(resolve => tx.oncomplete = resolve)
 }
 
-export async function getFile(path) {
-  if (!db) await initDB()
+function getFile(path) {
+  if (!db) return Promise.reject('DB not initialized')
   return new Promise((resolve, reject) => {
     const tx = db.transaction('files', 'readonly')
     const request = tx.objectStore('files').get(path)
@@ -98,12 +97,16 @@ export async function getFile(path) {
   })
 }
 
-export async function hasFile(path) {
-  if (!db) await initDB()
+function hasFile(path) {
+  if (!db) return Promise.resolve(false)
   return new Promise(resolve => {
     const tx = db.transaction('files', 'readonly')
     const request = tx.objectStore('files').get(path)
     request.onsuccess = () => resolve(!!request.result)
     request.onerror = () => resolve(false)
   })
+}
+
+window.AlbumDB = {
+  initDB, saveMedia, getMedia, deleteMedia, saveAlbums, getAlbums, deleteAlbum, saveFile, getFile, hasFile
 }

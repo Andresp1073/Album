@@ -1,5 +1,3 @@
-import { init, checkAuth, logout, loadMedia, loadAlbums, getUrl, remove, addAlbum, removeAlbum } from './api.js'
-
 let allMedia = []
 let allAlbums = []
 let currentIndex = 0
@@ -32,7 +30,7 @@ document.getElementById('noBtn').onclick = () => deleteModal.classList.remove('s
 document.getElementById('saveBtn').onclick = async () => {
   const name = document.getElementById('albumName').value.trim()
   if (!name) return
-  const { error } = await addAlbum(name)
+  const { error } = await window.AlbumAPI.addAlbum(name)
   if (!error) {
     albumModal.classList.remove('show')
     document.getElementById('albumName').value = ''
@@ -44,10 +42,10 @@ document.getElementById('saveBtn').onclick = async () => {
 document.getElementById('yesBtn').onclick = async () => {
   deleteModal.classList.remove('show')
   if (deleteType === 'media' && deleteTarget) {
-    await remove(deleteTarget.id)
+    await window.AlbumAPI.remove(deleteTarget.id)
     loadData()
   } else if (deleteType === 'album' && deleteTarget) {
-    await removeAlbum(deleteTarget.id)
+    await window.AlbumAPI.removeAlbum(deleteTarget.id)
     loadData()
   }
   deleteTarget = null
@@ -69,7 +67,7 @@ viewer.onclick = (e) => {
 document.getElementById('vShare').onclick = async () => {
   const item = allMedia[currentIndex]
   if (!item) return
-  const url = await getUrl(item)
+  const url = await window.AlbumAPI.getUrl(item)
   if (url && navigator.share) {
     try { await navigator.share({ url, title: 'Foto' }) } catch (e) {}
   }
@@ -86,7 +84,7 @@ document.getElementById('vDelete').onclick = () => {
 // Logout
 document.getElementById('logoutBtn').onclick = async () => {
   if (confirm('¿Cerrar sesión?')) {
-    await logout()
+    await window.AlbumAPI.logout()
     location.href = 'index.html'
   }
 }
@@ -98,8 +96,8 @@ function closeViewer() {
 }
 
 async function loadData() {
-  allMedia = await loadMedia()
-  allAlbums = await loadAlbums()
+  allMedia = await window.AlbumAPI.loadMedia()
+  allAlbums = await window.AlbumAPI.loadAlbums()
   renderPhotos()
   renderAlbums()
 }
@@ -115,7 +113,7 @@ function renderPhotos() {
     div.className = 'item'
     const img = document.createElement('img')
     img.loading = 'lazy'
-    getUrl(item).then(url => { if (url) img.src = url })
+    window.AlbumAPI.getUrl(item).then(url => { if (url) img.src = url })
     div.onclick = () => openViewer(i)
     div.appendChild(img)
     photoGrid.appendChild(div)
@@ -140,14 +138,15 @@ function renderAlbums() {
 function openViewer(index) {
   currentIndex = index
   const item = allMedia[index]
-  getUrl(item).then(url => { if (url) vImg.src = url })
+  window.AlbumAPI.getUrl(item).then(url => { if (url) vImg.src = url })
   viewer.classList.add('show')
   document.getElementById('vMenu').style.display = 'block'
   document.getElementById('vDropdown').style.display = 'none'
 }
 
 async function start() {
-  const ok = await checkAuth()
+  await window.AlbumAPI.initApp()
+  const ok = await window.AlbumAPI.checkAuth()
   if (!ok) {
     location.href = 'index.html'
     return

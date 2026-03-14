@@ -1,4 +1,4 @@
-const CACHE = 'album-v5'
+const CACHE = 'album-v6'
 
 const FILES = [
   '/',
