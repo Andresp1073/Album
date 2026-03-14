@@ -3,13 +3,17 @@ const SUPABASE_KEY = "sb_publishable_EClHgpUxwV7Bshxeva7fww_HejLA6OF"
 
 let userId
 
+function getSupabaseLib() {
+  return window.supabase || window.supabaseLib
+}
+
 async function waitForSupabase() {
   let attempts = 0
-  while (!window.supabase && attempts < 50) {
+  while (!getSupabaseLib() && attempts < 50) {
     await new Promise(r => setTimeout(r, 100))
     attempts++
   }
-  if (!window.supabase) {
+  if (!getSupabaseLib()) {
     throw new Error('Supabase library not loaded')
   }
 }
@@ -17,7 +21,9 @@ async function waitForSupabase() {
 async function initApp() {
   await window.AlbumDB.initDB()
   await waitForSupabase()
-  window.supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
+  const supabaseLib = getSupabaseLib()
+  window.supabaseClient = supabaseLib.createClient(SUPABASE_URL, SUPABASE_KEY)
+}
   
   // Try to create albums table if it doesn't exist
   try {
