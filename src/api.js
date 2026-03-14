@@ -34,6 +34,7 @@ async function initApp() {
 
 async function checkAuth() {
   const session = localStorage.getItem('supabase_session')
+  console.log('Session exists:', !!session)
   if (!session) return false
   
   if (!window.supabaseClient) {
@@ -43,6 +44,7 @@ async function checkAuth() {
   
   try {
     const { data, error } = await window.supabaseClient.auth.getUser()
+    console.log('Auth response:', data, error)
     if (error || !data.user) {
       console.error('Auth error:', error)
       return false
