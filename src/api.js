@@ -6,10 +6,9 @@ window.AlbumAPI = {
   },
 
   checkAuth: async function() {
-    const session = localStorage.getItem('supabase_session')
-    if (!session) return false
-    
     try {
+      const { data: sessionData } = await window.sbClient.auth.getSession()
+      if (!sessionData?.session) return false
       const { data, error } = await window.sbClient.auth.getUser()
       if (error || !data.user) return false
       userId = data.user.id
@@ -117,7 +116,6 @@ window.AlbumAPI = {
 
   logout: async function() {
     await window.sbClient.auth.signOut()
-    localStorage.removeItem('supabase_session')
     location.href = 'index.html'
   }
 }

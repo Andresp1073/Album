@@ -9,56 +9,42 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <link rel="apple-touch-icon" href="/icons/icon-192.png">
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: Arial, sans-serif; background: linear-gradient(135deg, #fff0f6, #ffe4ec); min-height: 100vh; color: #4a2340; }
-    .container { max-width: 1200px; margin: 0 auto; padding: 16px; }
-    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-    h1 { color: #d63384; font-size: 1.5rem; }
-    .btn { padding: 10px 16px; border: none; border-radius: 12px; cursor: pointer; font-weight: bold; }
-    .btn-primary { background: #ff6fae; color: white; }
-    .btn-secondary { background: white; color: #d63384; border: 1px solid #ffd0e2; }
-    .btn-danger { background: #e63946; color: white; }
-    
-    .tabs { display: flex; gap: 8px; margin-bottom: 16px; }
-    .tab { flex: 1; padding: 12px; border: none; border-radius: 12px; background: white; color: #d63384; font-weight: bold; cursor: pointer; }
-    .tab.active { background: #d63384; color: white; }
-    
-    .page { display: none; }
-    .page.active { display: block; }
-    
-    .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
-    .photo-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; }
-    
-    .card { background: white; border-radius: 14px; padding: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); cursor: pointer; }
-    .cover { width: 100%; height: 100px; border-radius: 10px; background: #ffe0ec; background-size: cover; background-position: center; margin-bottom: 8px; }
-    .title { font-size: 0.95rem; font-weight: bold; color: #d63384; }
-    
-    .item { aspect-ratio: 1; border-radius: 4px; overflow: hidden; cursor: pointer; }
-    .item img { width: 100%; height: 100%; object-fit: cover; }
-    
-    .empty { grid-column: 1/-1; text-align: center; padding: 40px; color: #7a4a63; }
-    
-    .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
-    .modal.show { display: flex; }
-    .modal-card { background: white; border-radius: 16px; padding: 24px; width: 100%; max-width: 320px; }
-    .modal-card h3 { color: #d63384; margin-bottom: 16px; }
-    .modal-card input { width: 100%; padding: 12px; border: 1px solid #f1c5d9; border-radius: 10px; margin-bottom: 12px; font-size: 15px; }
-    .modal-actions { display: flex; gap: 10px; justify-content: center; }
-    
-    .viewer { position: fixed; inset: 0; background: black; display: none; align-items: center; justify-content: center; z-index: 2000; }
-    .viewer.show { display: flex; }
-    .viewer img { max-width: 100%; max-height: 100%; object-fit: contain; }
-    .viewer-close { position: absolute; top: 16px; left: 16px; width: 40px; height: 40px; border-radius: 50%; border: none; background: rgba(255,255,255,0.2); color: white; font-size: 20px; cursor: pointer; }
-    .viewer-menu-btn { position: absolute; top: 16px; right: 16px; width: 40px; height: 40px; border-radius: 50%; border: none; background: rgba(255,255,255,0.2); color: white; font-size: 20px; cursor: pointer; }
-    .viewer-menu { display: none; position: absolute; top: 60px; right: 16px; background: white; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
-    .viewer-menu button { display: block; width: 100%; padding: 14px 20px; border: none; background: white; text-align: left; cursor: pointer; font-size: 15px; }
-    
-    .actions { display: flex; gap: 8px; }
-    
-    @media (min-width: 600px) {
-      .grid { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
-      .photo-grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 8px; }
-    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Arial,sans-serif;background:linear-gradient(135deg,#fff0f6,#ffe4ec);min-height:100vh;color:#4a2340}
+    .container{max-width:1200px;margin:0 auto;padding:16px}
+    .header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+    h1{color:#d63384;font-size:1.5rem}
+    .btn{padding:10px 16px;border:none;border-radius:12px;cursor:pointer;font-weight:bold}
+    .btn-primary{background:#ff6fae;color:white}
+    .btn-secondary{background:white;color:#d63384;border:1px solid #ffd0e2}
+    .tabs{display:flex;gap:8px;margin-bottom:16px}
+    .tab{flex:1;padding:12px;border:none;border-radius:12px;background:white;color:#d63384;font-weight:bold;cursor:pointer}
+    .tab.active{background:#d63384;color:white}
+    .page{display:none}
+    .page.active{display:block}
+    .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+    .photo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px}
+    .card{background:white;border-radius:14px;padding:10px;box-shadow:0 2px 8px rgba(0,0,0,0.08);cursor:pointer}
+    .cover{width:100%;height:100px;border-radius:10px;background:#ffe0ec;background-size:cover;background-position:center;margin-bottom:8px}
+    .title{font-size:0.95rem;font-weight:bold;color:#d63384}
+    .item{aspect-ratio:1;border-radius:4px;overflow:hidden;cursor:pointer}
+    .item img{width:100%;height:100%;object-fit:cover}
+    .empty{grid-column:1/-1;text-align:center;padding:40px;color:#7a4a63}
+    .modal{position:fixed;inset:0;background:rgba(0,0,0,0.5);display:none;align-items:center;justify-content:center;z-index:1000;padding:20px}
+    .modal.show{display:flex}
+    .modal-card{background:white;border-radius:16px;padding:24px;width:100%;max-width:320px}
+    .modal-card h3{color:#d63384;margin-bottom:16px}
+    .modal-card input{width:100%;padding:12px;border:1px solid #f1c5d9;border-radius:10px;margin-bottom:12px;font-size:15px}
+    .modal-actions{display:flex;gap:10px;justify-content:center}
+    .viewer{position:fixed;inset:0;background:black;display:none;align-items:center;justify-content:center;z-index:2000}
+    .viewer.show{display:flex}
+    .viewer img{max-width:100%;max-height:100%;object-fit:contain}
+    .viewer-close{position:absolute;top:16px;left:16px;width:40px;height:40px;border-radius:50%;border:none;background:rgba(255,255,255,0.2);color:white;font-size:20px;cursor:pointer}
+    .viewer-menu{position:absolute;top:16px;right:16px;width:40px;height:40px;border-radius:50%;border:none;background:rgba(255,255,255,0.2);color:white;font-size:20px;cursor:pointer}
+    .viewer-dropdown{display:none;position:absolute;top:60px;right:16px;background:white;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,0.3)}
+    .viewer-dropdown button{display:block;width:100%;padding:14px 20px;border:none;background:white;text-align:left;cursor:pointer;font-size:15px}
+    .actions{display:flex;gap:8px}
+    @media(min-width:600px){.grid{grid-template-columns:repeat(auto-fill,minmax(180px,1fr))}.photo-grid{grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px}}
   </style>
 </head>
 <body>
@@ -100,7 +86,7 @@
     <div class="modal-card">
       <h3>¿Eliminar?</h3>
       <div class="modal-actions">
-        <button class="btn btn-danger" id="yesBtn">Sí</button>
+        <button class="btn btn-primary" style="background:#e63946" id="yesBtn">Sí</button>
         <button class="btn btn-secondary" id="noBtn">No</button>
       </div>
     </div>
@@ -108,8 +94,8 @@
 
   <div class="viewer" id="viewer">
     <button class="viewer-close" id="vClose">✕</button>
-    <button class="viewer-menu-btn" id="vMenu">⋮</button>
-    <div class="viewer-menu" id="vDropdown">
+    <button class="viewer-menu" id="vMenu">⋮</button>
+    <div class="viewer-dropdown" id="vDropdown">
       <button id="vShare">Compartir</button>
       <button id="vDelete">Eliminar</button>
     </div>
@@ -118,12 +104,172 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    const SUPABASE_URL = "https://jodqkybcpxvqfxdqthfk.supabase.co"
-    const SUPABASE_KEY = "sb_publishable_EClHgpUxwV7Bshxeva7fww_HejLA6OF"
-    window.sbClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
+    const client = supabase.createClient(
+      "https://jodqkybcpxvqfxdqthfk.supabase.co",
+      "sb_publishable_EClHgpUxwV7Bshxeva7fww_HejLA6OF"
+    )
+
+    let allMedia = []
+    let allAlbums = []
+    let currentIndex = 0
+    let deleteTarget = null
+    let deleteType = null
+
+    // Navigation
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.onclick = () => {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'))
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'))
+        tab.classList.add('active')
+        document.getElementById(tab.dataset.page).classList.add('active')
+      }
+    })
+
+    // Modals
+    document.getElementById('addBtn').onclick = () => document.getElementById('albumModal').classList.add('show')
+    document.getElementById('cancelBtn').onclick = () => document.getElementById('albumModal').classList.remove('show')
+    document.getElementById('noBtn').onclick = () => document.getElementById('deleteModal').classList.remove('show')
+
+    // Create album
+    document.getElementById('saveBtn').onclick = async () => {
+      const name = document.getElementById('albumName').value.trim()
+      if (!name) return
+      const { error } = await client.from('albums').insert([{ name }])
+      if (!error) {
+        document.getElementById('albumModal').classList.remove('show')
+        document.getElementById('albumName').value = ''
+        loadData()
+      }
+    }
+
+    // Delete
+    document.getElementById('yesBtn').onclick = async () => {
+      document.getElementById('deleteModal').classList.remove('show')
+      if (deleteType === 'media' && deleteTarget) {
+        await client.from('media').update({ is_deleted: true }).eq('id', deleteTarget.id)
+        loadData()
+      } else if (deleteType === 'album' && deleteTarget) {
+        await client.from('albums').delete().eq('id', deleteTarget.id)
+        loadData()
+      }
+      deleteTarget = null
+      deleteType = null
+    }
+
+    // Viewer
+    document.getElementById('vClose').onclick = () => {
+      document.getElementById('viewer').classList.remove('show')
+      document.getElementById('vMenu').style.display = 'none'
+      document.getElementById('vDropdown').style.display = 'none'
+    }
+    document.getElementById('vMenu').onclick = (e) => {
+      e.stopPropagation()
+      const d = document.getElementById('vDropdown')
+      d.style.display = d.style.display === 'block' ? 'none' : 'block'
+    }
+    document.getElementById('viewer').onclick = (e) => {
+      if (e.target.id === 'viewer') document.getElementById('vClose').onclick()
+      document.getElementById('vDropdown').style.display = 'none'
+    }
+
+    document.getElementById('vShare').onclick = async () => {
+      const item = allMedia[currentIndex]
+      if (!item) return
+      const { data } = await client.storage.from('album-media').createSignedUrl(item.file_path, 3600)
+      if (data?.signedUrl && navigator.share) {
+        try { await navigator.share({ url: data.signedUrl, title: 'Foto' }) } catch (e) {}
+      }
+      document.getElementById('vClose').onclick()
+    }
+
+    document.getElementById('vDelete').onclick = () => {
+      deleteType = 'media'
+      deleteTarget = allMedia[currentIndex]
+      document.getElementById('vClose').onclick()
+      document.getElementById('deleteModal').classList.add('show')
+    }
+
+    // Logout
+    document.getElementById('logoutBtn').onclick = async () => {
+      if (confirm('¿Cerrar sesión?')) {
+        await client.auth.signOut()
+        localStorage.removeItem('supabase_session')
+        location.href = 'index.html'
+      }
+    }
+
+    async function loadData() {
+      const { data: { user } } = await client.auth.getUser()
+      if (!user) { location.href = 'index.html'; return }
+
+      const { data: media } = await client.from('media').select('*').eq('user_id', user.id).eq('is_deleted', false).order('created_at', { ascending: false })
+      allMedia = media || []
+
+      const { data: albums } = await client.from('albums').select('*').eq('user_id', user.id).order('created_at', { ascending: false })
+      allAlbums = albums || []
+
+      renderPhotos()
+      renderAlbums()
+    }
+
+    function renderPhotos() {
+      const grid = document.getElementById('photoGrid')
+      grid.innerHTML = ''
+      if (allMedia.length === 0) {
+        grid.innerHTML = '<div class="empty">No hay fotos todavía 💕<br>Sube fotos a un álbum</div>'
+        return
+      }
+      allMedia.forEach((item, i) => {
+        const div = document.createElement('div')
+        div.className = 'item'
+        const img = document.createElement('img')
+        img.loading = 'lazy'
+        
+        client.storage.from('album-media').createSignedUrl(item.file_path, 3600).then(({ data }) => {
+          if (data?.signedUrl) img.src = data.signedUrl
+        })
+        
+        div.onclick = () => openViewer(i)
+        div.appendChild(img)
+        grid.appendChild(div)
+      })
+    }
+
+    function renderAlbums() {
+      const grid = document.getElementById('albumGrid')
+      grid.innerHTML = ''
+      if (allAlbums.length === 0) {
+        grid.innerHTML = '<div class="empty">Crea un álbum para comenzar</div>'
+        return
+      }
+      allAlbums.forEach(album => {
+        const div = document.createElement('div')
+        div.className = 'card'
+        div.innerHTML = `<div class="cover"></div><div class="title">${album.name}</div>`
+        div.onclick = () => location.href = `album.html?id=${album.id}`
+        grid.appendChild(div)
+      })
+    }
+
+    function openViewer(index) {
+      currentIndex = index
+      const item = allMedia[index]
+      client.storage.from('album-media').createSignedUrl(item.file_path, 3600).then(({ data }) => {
+        if (data?.signedUrl) document.getElementById('vImg').src = data.signedUrl
+      })
+      document.getElementById('viewer').classList.add('show')
+      document.getElementById('vMenu').style.display = 'block'
+      document.getElementById('vDropdown').style.display = 'none'
+    }
+
+    // Init
+    client.auth.getUser().then(({ data, error }) => {
+      if (error || !data.user) {
+        location.href = 'index.html'
+        return
+      }
+      loadData()
+    })
   </script>
-  <script src="src/db.js"></script>
-  <script src="src/api.js"></script>
-  <script src="src/dashboard.js"></script>
 </body>
 </html>

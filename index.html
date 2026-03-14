@@ -33,27 +33,24 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    const SUPABASE_URL = "https://jodqkybcpxvqfxdqthfk.supabase.co"
-    const SUPABASE_KEY = "sb_publishable_EClHgpUxwV7Bshxeva7fww_HejLA6OF"
-    window.sbClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
+    const client = supabase.createClient(
+      "https://jodqkybcpxvqfxdqthfk.supabase.co",
+      "sb_publishable_EClHgpUxwV7Bshxeva7fww_HejLA6OF"
+    )
 
-    const session = localStorage.getItem('supabase_session')
-    if (session) {
-      const s = JSON.parse(session)
-      if (s && s.expires_at > Date.now() / 1000) {
-        location.href = 'dashboard.html'
-      }
-    }
+    // Si ya hay sesión activa, ir al dashboard
+    client.auth.getSession().then(({ data }) => {
+      if (data?.session) location.href = 'dashboard.html'
+    })
 
     document.getElementById('form').onsubmit = async (e) => {
       e.preventDefault()
       const email = document.getElementById('email').value.trim()
       const password = document.getElementById('password').value
       const errorEl = document.getElementById('error')
-      
       errorEl.textContent = ''
       
-      const { error } = await window.sbClient.auth.signInWithPassword({ email, password })
+      const { error } = await client.auth.signInWithPassword({ email, password })
       
       if (error) {
         errorEl.textContent = error.message

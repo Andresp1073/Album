@@ -103,6 +103,37 @@
       box-shadow:0 8px 20px rgba(0,0,0,.08);
     }
 
+    .trash-dropdown, .viewer-dropdown {
+      display: none;
+      flex-direction: column;
+      position: absolute;
+      right: 0;
+      top: calc(100% + 8px);
+      background: white;
+      border-radius: 14px;
+      box-shadow: 0 8px 28px rgba(0,0,0,0.18);
+      overflow: hidden;
+      z-index: 100;
+      min-width: 200px;
+    }
+    .trash-dropdown button, .viewer-dropdown button {
+      display: block;
+      width: 100%;
+      padding: 14px 20px;
+      border: none;
+      background: white;
+      text-align: left;
+      cursor: pointer;
+      font-size: 15px;
+      color: #333;
+    }
+    .trash-dropdown button:hover, .viewer-dropdown button:hover {
+      background: #fff0f6;
+    }
+    .trash-menu-wrap, .viewer-menu-wrap {
+      position: relative;
+    }
+    .text-danger { color: #e63946 !important; }
 
 
     .gallery-grid{
@@ -161,6 +192,7 @@
     }
 
     .viewer-modal{
+      display:none;
       position:fixed;
       inset:0;
       background:rgba(20, 10, 18, .88);
@@ -226,6 +258,7 @@
 
 
     .confirm-modal{
+      display:none;
       position:fixed;
       inset:0;
       background:rgba(20, 10, 18, .58);
