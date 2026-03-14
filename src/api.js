@@ -24,19 +24,6 @@ async function initApp() {
   const supabaseLib = getSupabaseLib()
   window.supabaseClient = supabaseLib.createClient(SUPABASE_URL, SUPABASE_KEY)
 }
-  
-  // Try to create albums table if it doesn't exist
-  try {
-    await window.supabaseClient.from('album').select('id').limit(1)
-  } catch (e) {
-    console.log('Album table might not exist, trying to create...')
-    try {
-      await window.supabaseClient.rpc('create_albums_table', {})
-    } catch (e2) {
-      console.log('Could not create albums table automatically')
-    }
-  }
-}
 
 async function checkAuth() {
   const session = localStorage.getItem('supabase_session')
