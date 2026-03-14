@@ -35,7 +35,11 @@
   <script>
     const SUPABASE_URL = "https://jodqkybcpxvqfxdqthfk.supabase.co"
     const SUPABASE_KEY = "sb_publishable_EClHgpUxwV7Bshxeva7fww_HejLA6OF"
-    window.supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
+    if (typeof supabase !== 'undefined') {
+      window.supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
+    } else {
+      window.supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
+    }
 
     const session = localStorage.getItem('supabase_session')
     if (session) {
