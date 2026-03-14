@@ -35,7 +35,7 @@
   <script>
     const SUPABASE_URL = "https://jodqkybcpxvqfxdqthfk.supabase.co"
     const SUPABASE_KEY = "sb_publishable_EClHgpUxwV7Bshxeva7fww_HejLA6OF"
-    window.sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
+    window.sbClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
 
     const session = localStorage.getItem('supabase_session')
     if (session) {
