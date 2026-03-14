@@ -395,6 +395,8 @@ function updateViewer() {
   const item = allMedia[currentPhotoIndex]
   if (!item) return
   
+  if (viewerMenuBtn) viewerMenuBtn.style.display = "none"
+  
   viewerContent.innerHTML = ""
   if (currentVideo) {
     currentVideo.pause()
@@ -432,6 +434,8 @@ function showLongpressModal(index) {
   getSignedFileUrl(item.file_path).then(url => {
     if (url) {
       longpressImg.src = url
+      if (longpressShare) longpressShare.style.display = "none"
+      if (longpressDelete) longpressDelete.style.display = "none"
       longpressModal.classList.add("show")
     }
   })
@@ -440,6 +444,8 @@ function showLongpressModal(index) {
 function closeLongpressModal() {
   longpressModal.classList.remove("show")
   longpressIndex = null
+  if (longpressShare) longpressShare.style.display = "flex"
+  if (longpressDelete) longpressDelete.style.display = "flex"
 }
 
 longpressModal?.addEventListener("click", (e) => {
