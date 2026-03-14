@@ -1,12 +1,3 @@
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
-const SUPABASE_URL = "https://jodqkybcpxvqfxdqthfk.supabase.co"
-const SUPABASE_KEY = "sb_publishable_EClHgpUxwV7Bshxeva7fww_HejLA6OF"
-
-// Initialize Supabase immediately
-window.sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
-</script>
-
 const DB_NAME = 'AlbumApp'
 const DB_VERSION = 1
 
