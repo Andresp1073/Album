@@ -235,8 +235,15 @@ async function uploadFile(file, albumId) {
 }
 
 async function logout() {
-  await window.supabaseClient.auth.signOut()
+  try {
+    if (window.supabaseClient) {
+      await window.supabaseClient.auth.signOut()
+    }
+  } catch (e) {
+    console.log('Logout error:', e)
+  }
   localStorage.removeItem('supabase_session')
+  location.href = 'index.html'
 }
 
 window.AlbumAPI = {
