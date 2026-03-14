@@ -3,334 +3,91 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
   <title>Álbum</title>
-
-  <link rel="stylesheet" href="css/style.css?v=3">
-
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#d63384">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="apple-mobile-web-app-title" content="Álbum">
   <link rel="apple-touch-icon" href="/icons/icon-192.png">
-
   <style>
-    body{
-      margin:0;
-      font-family:Arial, Helvetica, sans-serif;
-      background:linear-gradient(135deg,#fff0f6,#ffe4ec);
-      min-height:100vh;
-      color:#4a2340;
-    }
-
-    .album-page{
-      max-width:1200px;
-      margin:auto;
-      padding:24px 16px 40px;
-    }
-
-    .album-topbar{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:12px;
-      flex-wrap:wrap;
-      margin-bottom:20px;
-    }
-
-    .album-title{
-      margin:0;
-      color:#d63384;
-      font-size:1.9rem;
-    }
-
-    .album-subtitle{
-      margin:8px 0 0;
-      color:#7a4a63;
-    }
-
-    .album-actions{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-    }
-
-    .btn{
-      border:none;
-      padding:12px 18px;
-      border-radius:12px;
-      cursor:pointer;
-      font-size:15px;
-      font-weight:bold;
-      transition:.25s ease;
-    }
-
-    .btn-primary{
-      background:#ff6fae;
-      color:white;
-      box-shadow:0 10px 20px rgba(214,51,132,.18);
-    }
-
-    .btn-secondary{
-      background:white;
-      color:#d63384;
-      border:1px solid #ffd0e2;
-    }
-
-    .btn-danger{
-      background:#e63946;
-      color:white;
-    }
-
-    .btn:hover{
-      transform:translateY(-1px);
-    }
-
-    .upload-panel{
-      display:none;
-      background:white;
-      border-radius:16px;
-      padding:16px;
-      box-shadow:0 10px 24px rgba(0,0,0,.08);
-      margin-bottom:20px;
-    }
-
-    .upload-panel.show{
-      display:block;
-    }
-
-    .upload-panel p{
-      margin:0 0 12px;
-      color:#7a4a63;
-      font-size:0.9rem;
-    }
-
-    .file-input{
-      display:block;
-      width:100%;
-      margin-bottom:12px;
-    }
-
-    .gallery-grid{
-      display:grid;
-      grid-template-columns:repeat(auto-fill,minmax(160px,1fr));
-      gap:12px;
-    }
-
-    .media-card{
-      background:white;
-      border-radius:18px;
-      overflow:hidden;
-      box-shadow:0 8px 18px rgba(0,0,0,.08);
-      aspect-ratio:1/1;
-      position:relative;
-      border:1px solid #ffe2ec;
-      cursor:pointer;
-      display:block;
-    }
-
-    .media-inner{
-      width:100%;
-      height:100%;
-      position:relative;
-      background:#fdf6f9;
-    }
-
-    .media-preview{
-      width:100%;
-      height:100%;
-      object-fit:cover;
-      display:block;
-      background:#f8f1f5;
-    }
-
-    .media-preview.video-preview{
-      object-fit:cover;
-    }
-
-    .media-badge{
-      display:none;
-    }
-
-    .media-fallback{
-      width:100%;
-      height:100%;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      text-align:center;
-      padding:12px;
-      color:#b15b87;
-      font-weight:bold;
-      line-height:1.4;
-      background:linear-gradient(135deg,#fff,#fff7fb);
-    }
-
-    .empty-media{
-      background:white;
-      border-radius:20px;
-      padding:32px 20px;
-      text-align:center;
-      color:#7a4a63;
-      box-shadow:0 10px 24px rgba(0,0,0,.06);
-    }
-
-    .status-text{
-      margin-top:10px;
-      font-size:.95rem;
-      color:#7a4a63;
-    }
-
-    .viewer-modal{
-      position:fixed;
-      inset:0;
-      background:black;
-      display:none !important;
-      align-items:center;
-      justify-content:center;
-      z-index:9999;
-    }
-
-    .viewer-modal.show{
-      display:flex;
-    }
-
-    .viewer-content{
-      width:100%;
-      height:100%;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:0;
-    }
-
-    @media (min-width:600px){
-      .viewer-content{
-        padding:20px;
-      }
-    }
-
-    .viewer-media{
-      max-width:100%;
-      max-height:100%;
-      object-fit:contain;
-    }
-
-
-    .viewer-delete-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);align-items:center;justify-content:center;z-index:9999}
-    .viewer-delete-modal.show{display:flex}
-    .viewer-delete-card{background:white;border-radius:16px;padding:24px;text-align:center}
-    .viewer-delete-card h3{margin:0 0 10px;color:#d63384}
-    .viewer-delete-card p{margin:0 0 16px;color:#666;font-size:14px}
-    .viewer-delete-card div{display:flex;gap:10px;justify-content:center}
-
-    .confirm-modal{
-      position:fixed;
-      inset:0;
-      background:rgba(20, 10, 18, .58);
-      display:none;
-      align-items:center;
-      justify-content:center;
-      z-index:1100;
-      padding:20px;
-    }
-
-    .confirm-card{
-      width:min(100%, 420px);
-      background:white;
-      border-radius:20px;
-      padding:24px;
-      box-shadow:0 18px 42px rgba(0,0,0,.22);
-      text-align:center;
-    }
-
-    .confirm-card h3{
-      margin-top:0;
-      color:#d63384;
-    }
-
-    .confirm-card p{
-      color:#6f4960;
-      line-height:1.6;
-      margin-bottom:20px;
-    }
-
-    .confirm-actions{
-      display:flex;
-      gap:12px;
-      justify-content:center;
-      flex-wrap:wrap;
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Arial, sans-serif; background: linear-gradient(135deg, #fff0f6, #ffe4ec); min-height: 100vh; color: #4a2340; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 16px; }
+    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+    h1 { color: #d63384; font-size: 1.3rem; flex: 1; }
+    .btn { padding: 10px 16px; border: none; border-radius: 12px; cursor: pointer; font-weight: bold; }
+    .btn-secondary { background: white; color: #d63384; border: 1px solid #ffd0e2; }
+    .btn-danger { background: #e63946; color: white; }
+    
+    .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; }
+    .item { aspect-ratio: 1; border-radius: 4px; overflow: hidden; cursor: pointer; position: relative; }
+    .item img { width: 100%; height: 100%; object-fit: cover; }
+    .video-icon { position: absolute; bottom: 8px; right: 8px; font-size: 18px; }
+    
+    .empty { text-align: center; padding: 60px 20px; color: #7a4a63; }
+    
+    .fab { position: fixed; bottom: 24px; right: 24px; width: 56px; height: 56px; border-radius: 50%; border: none; background: #d63384; color: white; font-size: 24px; cursor: pointer; box-shadow: 0 4px 12px rgba(214, 51, 132, 0.4); }
+    
+    .viewer { position: fixed; inset: 0; background: black; display: none; align-items: center; justify-content: center; z-index: 2000; }
+    .viewer.show { display: flex; }
+    .viewer img, .viewer video { max-width: 100%; max-height: 100%; object-fit: contain; }
+    .viewer-close { position: absolute; top: 16px; left: 16px; width: 40px; height: 40px; border-radius: 50%; border: none; background: rgba(255,255,255,0.2); color: white; font-size: 20px; cursor: pointer; }
+    .viewer-prev, .viewer-next { position: absolute; top: 50%; transform: translateY(-50%); width: 44px; height: 44px; border-radius: 50%; border: none; background: rgba(255,255,255,0.2); color: white; font-size: 20px; cursor: pointer; }
+    .viewer-prev { left: 16px; }
+    .viewer-next { right: 16px; }
+    .viewer-menu-btn { position: absolute; top: 16px; right: 16px; width: 40px; height: 40px; border-radius: 50%; border: none; background: rgba(255,255,255,0.2); color: white; font-size: 20px; cursor: pointer; }
+    .viewer-menu { display: none; position: absolute; top: 60px; right: 16px; background: white; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+    .viewer-menu button { display: block; width: 100%; padding: 14px 20px; border: none; background: white; text-align: left; cursor: pointer; font-size: 15px; color: #333; }
+    .viewer-menu button.danger { color: #e63946; }
+    
+    .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 3000; padding: 20px; }
+    .modal.show { display: flex; }
+    .modal-card { background: white; border-radius: 16px; padding: 24px; width: 100%; max-width: 300px; text-align: center; }
+    .modal-card h3 { color: #d63384; margin-bottom: 16px; }
+    .modal-actions { display: flex; gap: 10px; justify-content: center; }
+    
+    input { display: none; }
+    
+    @media (min-width: 600px) {
+      .grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; }
     }
   </style>
 </head>
 <body>
-  <div class="album-page">
-    <div class="album-topbar">
-      <div>
-        <h1 class="album-title" id="albumTitle">Álbum</h1>
-      </div>
-
-      <div class="album-actions">
-        <button class="btn btn-secondary" id="backBtn">← Volver</button>
-        <button class="btn btn-primary" id="uploadToggleBtn">+ Subir</button>
-      </div>
+  <div class="container">
+    <div class="header">
+      <a href="dashboard.html" class="btn btn-secondary">←</a>
+      <h1>Álbum</h1>
+      <button class="btn btn-danger" id="deleteBtn">🗑️</button>
     </div>
 
-    <div class="upload-panel" id="uploadPanel">
-      <p>Selecciona fotos o videos para este álbum:</p>
-      <input class="file-input" type="file" id="fileInput" accept="image/*,video/*" multiple>
-      <button class="btn btn-primary" id="uploadBtn">Subir archivos</button>
-      <div class="status-text" id="statusText"></div>
-    </div>
-
-    <div class="gallery-grid" id="galleryGrid"></div>
+    <div class="grid" id="photoGrid"></div>
   </div>
 
-  <div class="viewer-modal" id="viewerModal">
-    <div class="viewer-content" id="viewerContent"></div>
-    <button class="viewer-menu-btn" id="viewerMenuBtn">⋮</button>
-    <div class="viewer-menu" id="viewerMenu">
-      <button id="shareBtn">
-        <span>Compartir...</span> 📤
-      </button>
-      <button id="deleteViewerBtn" class="text-danger">
-        <span>Eliminar</span> 🗑️
-      </button>
+  <input type="file" id="fileInput" accept="image/*,video/*" multiple>
+  <button class="fab" id="uploadBtn">+</button>
+
+  <div class="viewer" id="viewer">
+    <button class="viewer-close" id="vClose">✕</button>
+    <button class="viewer-prev" id="vPrev">❮</button>
+    <button class="viewer-next" id="vNext">❯</button>
+    <button class="viewer-menu-btn" id="vMenu">⋮</button>
+    <div class="viewer-menu" id="vDropdown">
+      <button id="vShare">Compartir</button>
+      <button id="vDelete" class="danger">Eliminar</button>
     </div>
+    <div id="vContent"></div>
   </div>
 
-  <div class="viewer-delete-modal" id="confirmModal">
-    <div class="viewer-delete-card">
-      <h3>¿Eliminar?</h3>
-      <p>Se moverá a la papelera.</p>
-      <div>
-        <button class="btn btn-danger" id="confirmYesBtn">Sí</button>
-        <button class="btn btn-secondary" id="confirmNoBtn">No</button>
+  <div class="modal" id="deleteModal">
+    <div class="modal-card">
+      <h3>¿Eliminar esta foto?</h3>
+      <div class="modal-actions">
+        <button class="btn btn-danger" id="yesBtn">Sí</button>
+        <button class="btn btn-secondary" id="noBtn">No</button>
       </div>
     </div>
   </div>
 
-  <div class="longpress-modal" id="longpressModal">
-    <div class="longpress-content">
-      <img class="longpress-img" id="longpressImg" src="">
-    </div>
-    <div class="longpress-actions">
-      <button id="longpressShare">
-        <span>Compartir...</span> 📤
-      </button>
-      <button id="longpressDownload">
-        <span>Guardar en Fotos</span> ⬇️
-      </button>
-      <button id="longpressDelete" class="text-danger">
-        <span>Eliminar</span> 🗑️
-      </button>
-    </div>
-  </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="js/supabaseClient.js"></script>
-  <script src="js/album.js"></script>
-  <script src="js/pwa.js"></script>
+  <script type="module" src="src/album.js"></script>
 </body>
 </html>
