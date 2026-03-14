@@ -1,25 +1,27 @@
 const SUPABASE_URL = "https://jodqkybcpxvqfxdqthfk.supabase.co"
 const SUPABASE_KEY = "sb_publishable_EClHgpUxwV7Bshxeva7fww_HejLA6OF"
 
-let supabase, userId
+let userId
 
 async function initApp() {
   await window.AlbumDB.initDB()
-  supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
-  window.supabaseClient = supabase
+  if (!window.supabase) {
+    window.supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
+  }
+  window.supabaseClient = window.supabase
 }
 
 async function checkAuth() {
   const session = localStorage.getItem('supabase_session')
   if (!session) return false
   
-  if (!supabase) {
-    console.error('Supabase not initialized')
+  if (!window.supabase) {
+    console.error('Supabase not loaded')
     return false
   }
   
   try {
-    const { data, error } = await supabase.auth.getUser()
+    const { data, error } = await window.supabase.auth.getUser()
     if (error || !data.user) {
       console.error('Auth error:', error)
       return false
@@ -39,7 +41,7 @@ function getUserId() {
 
 async function signedUrl(path) {
   try {
-    const { data } = await supabase.storage.from('album-media').createSignedUrl(path, 3600)
+    const { data } = await window.supabase.storage.from('album-media').createSignedUrl(path, 3600)
     return data?.signedUrl || null
   } catch (e) {
     console.error('SignedURL error:', e)
@@ -48,13 +50,13 @@ async function signedUrl(path) {
 }
 
 async function loadMedia(albumId = null) {
-  if (!supabase || !userId) {
+  if (!window.supabase || !userId) {
     console.error('Not initialized')
     return []
   }
   
   try {
-    let query = supabase.from('media')
+    let query = window.supabase.from('media')
       .select('id, album_id, file_path, file_type, created_at')
       .eq('user_id', userId)
       .eq('is_deleted', false)
@@ -78,13 +80,13 @@ async function loadMedia(albumId = null) {
 }
 
 async function loadAlbums() {
-  if (!supabase || !userId) {
+  if (!window.supabase || !userId) {
     console.error('Not initialized')
     return []
   }
   
   try {
-    const { data, error } = await supabase.from('albums')
+    const { data, error } = await window.supabase.from('albums')
       .select('*')
       .eq('user_id', userId)
       .eq('is_deleted', false)
@@ -137,7 +139,7 @@ async function getUrl(item) {
 }
 
 async function remove(id) {
-  const { error } = await supabase.from('media')
+  const { error } = await window.supabase.from('media')
     .update({ is_deleted: true, deleted_at: new Date().toISOString() })
     .eq('id', id).eq('user_id', userId)
   
@@ -146,7 +148,7 @@ async function remove(id) {
 }
 
 async function removeAlbum(id) {
-  const { error } = await supabase.from('albums')
+  const { error } = await window.supabase.from('albums')
     .update({ is_deleted: true, deleted_at: new Date().toISOString() })
     .eq('id', id).eq('user_id', userId)
   
@@ -155,7 +157,7 @@ async function removeAlbum(id) {
 }
 
 async function addAlbum(name) {
-  const { data, error } = await supabase.from('albums')
+  const { data, error } = await window.supabase.from('albums')
     .insert([{ name, user_id: userId }])
     .select().single()
   
@@ -167,10 +169,10 @@ async function uploadFile(file, albumId) {
   const name = `${Date.now()}_${file.name}`
   const type = file.type.startsWith('video') ? 'video' : 'image'
   
-  const { error: upError } = await supabase.storage.from('album-media').upload(name, file)
+  const { error: upError } = await window.supabase.storage.from('album-media').upload(name, file)
   if (upError) throw upError
   
-  const { data, error } = await supabase.from('media')
+  const { data, error } = await window.supabase.from('media')
     .insert([{ file_path: name, file_type: type, album_id: albumId, user_id: userId }])
     .select().single()
   
@@ -183,7 +185,7 @@ async function uploadFile(file, albumId) {
 }
 
 async function logout() {
-  await supabase.auth.signOut()
+  await window.supabase.auth.signOut()
   localStorage.removeItem('supabase_session')
 }
 
