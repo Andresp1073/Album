@@ -118,12 +118,14 @@ async function loadAlbums() {
       if (!error && data) {
         console.log('Albums loaded from:', tableName, data.length)
         // Filter is_deleted client-side if column exists
-        const filtered = data.filter(a => a.is_deleted !== true)
+        const filtered = data.filter(a => !a.is_deleted)
         if (filtered.length > 0) await window.AlbumDB.saveAlbums(filtered)
         return filtered
+      } else if (error) {
+        console.log('Table', tableName, 'error:', error.message)
       }
     } catch (e) {
-      console.log('Try table:', tableName, e.message)
+      console.log('Try table:', tableName, 'error:', e.message)
     }
   }
   
@@ -180,21 +182,37 @@ async function remove(id) {
 }
 
 async function removeAlbum(id) {
-  const { error } = await window.supabaseClient.from('album')
+  // Try 'albums' first, then 'album'
+  let { error } = await window.supabaseClient.from('albums')
     .update({ is_deleted: true, deleted_at: new Date().toISOString() })
     .eq('id', id).eq('user_id', userId)
   
-  if (!error) await window.AlbumDB.deleteAlbum(id)
-  return !error
+  if (error) {
+    // Try alternate table name
+    await window.supabaseClient.from('album')
+      .update({ is_deleted: true, deleted_at: new Date().toISOString() })
+      .eq('id', id).eq('user_id', userId)
+  }
+  
+  await window.AlbumDB.deleteAlbum(id)
+  return true
 }
 
 async function addAlbum(name) {
-  const { data, error } = await window.supabaseClient.from('album')
+  // Try 'albums' first, then 'album'
+  let result = await window.supabaseClient.from('albums')
     .insert([{ name, user_id: userId }])
     .select().single()
   
-  if (!error && data) await window.AlbumDB.saveAlbums([data])
-  return { data, error }
+  if (result.error) {
+    // Try alternate table name
+    result = await window.supabaseClient.from('album')
+      .insert([{ name, user_id: userId }])
+      .select().single()
+  }
+  
+  if (!result.error && result.data) await window.AlbumDB.saveAlbums([result.data])
+  return result
 }
 
 async function uploadFile(file, albumId) {
