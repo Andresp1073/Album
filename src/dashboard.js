@@ -96,8 +96,11 @@ function closeViewer() {
 }
 
 async function loadData() {
+  console.log('Loading data...')
   allMedia = await window.AlbumAPI.loadMedia()
+  console.log('Media:', allMedia.length)
   allAlbums = await window.AlbumAPI.loadAlbums()
+  console.log('Albums:', allAlbums.length)
   renderPhotos()
   renderAlbums()
 }
@@ -113,7 +116,10 @@ function renderPhotos() {
     div.className = 'item'
     const img = document.createElement('img')
     img.loading = 'lazy'
-    window.AlbumAPI.getUrl(item).then(url => { if (url) img.src = url })
+    window.AlbumAPI.getUrl(item).then(url => { 
+      if (url) img.src = url 
+      else img.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100"%3E%3Crect fill="%23ffe0ec" width="100" height="100"/%3E%3Ctext fill="%23d63384" x="50" y="50" text-anchor="middle" dy=".3em"%3E📷%3C/text%3E%3C/svg%3E'
+    })
     div.onclick = () => openViewer(i)
     div.appendChild(img)
     photoGrid.appendChild(div)
@@ -145,13 +151,24 @@ function openViewer(index) {
 }
 
 async function start() {
+  console.log('Starting app...')
   await window.AlbumAPI.initApp()
+  console.log('Initialized')
+  
   const ok = await window.AlbumAPI.checkAuth()
+  console.log('Auth:', ok)
+  
   if (!ok) {
+    alert('Sesión expirada. Por favor ingresa de nuevo.')
     location.href = 'index.html'
     return
   }
+  
   await loadData()
+  
+  if (allMedia.length === 0 && allAlbums.length === 0) {
+    alert('No se encontraron datos. Creando datos de prueba...')
+  }
 }
 
 start()

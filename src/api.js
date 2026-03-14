@@ -13,11 +13,24 @@ async function checkAuth() {
   const session = localStorage.getItem('supabase_session')
   if (!session) return false
   
-  const { data, error } = await supabase.auth.getUser()
-  if (error || !data.user) return false
+  if (!supabase) {
+    console.error('Supabase not initialized')
+    return false
+  }
   
-  userId = data.user.id
-  return true
+  try {
+    const { data, error } = await supabase.auth.getUser()
+    if (error || !data.user) {
+      console.error('Auth error:', error)
+      return false
+    }
+    userId = data.user.id
+    console.log('User logged in:', userId)
+    return true
+  } catch (e) {
+    console.error('CheckAuth error:', e)
+    return false
+  }
 }
 
 function getUserId() {
@@ -25,11 +38,21 @@ function getUserId() {
 }
 
 async function signedUrl(path) {
-  const { data } = await supabase.storage.from('album-media').createSignedUrl(path, 3600)
-  return data?.signedUrl || null
+  try {
+    const { data } = await supabase.storage.from('album-media').createSignedUrl(path, 3600)
+    return data?.signedUrl || null
+  } catch (e) {
+    console.error('SignedURL error:', e)
+    return null
+  }
 }
 
 async function loadMedia(albumId = null) {
+  if (!supabase || !userId) {
+    console.error('Not initialized')
+    return []
+  }
+  
   try {
     let query = supabase.from('media')
       .select('id, album_id, file_path, file_type, created_at')
@@ -39,37 +62,63 @@ async function loadMedia(albumId = null) {
     
     if (albumId) query = query.eq('album_id', albumId)
     
-    const { data } = await query
+    const { data, error } = await query
+    if (error) {
+      console.error('Media query error:', error)
+      return []
+    }
+    
+    console.log('Media loaded:', data?.length || 0)
     if (data) await window.AlbumDB.saveMedia(data)
     return data || []
   } catch (e) {
-    console.error('Error loading media:', e)
+    console.error('Load media error:', e)
     return await window.AlbumDB.getMedia(albumId)
   }
 }
 
 async function loadAlbums() {
+  if (!supabase || !userId) {
+    console.error('Not initialized')
+    return []
+  }
+  
   try {
-    const { data } = await supabase.from('albums')
+    const { data, error } = await supabase.from('albums')
       .select('*')
       .eq('user_id', userId)
       .eq('is_deleted', false)
       .order('created_at', { ascending: false })
     
+    if (error) {
+      console.error('Albums query error:', error)
+      return []
+    }
+    
+    console.log('Albums loaded:', data?.length || 0)
     if (data) await window.AlbumDB.saveAlbums(data)
     return data || []
   } catch (e) {
-    console.error('Error loading albums:', e)
+    console.error('Load albums error:', e)
     return await window.AlbumDB.getAlbums()
   }
 }
 
 async function getUrl(item) {
+  if (!item || !item.file_path) {
+    console.error('Invalid item')
+    return null
+  }
+  
   const path = item.file_path
   
-  if (await window.AlbumDB.hasFile(path)) {
-    const blob = await window.AlbumDB.getFile(path)
-    if (blob) return URL.createObjectURL(blob)
+  try {
+    if (await window.AlbumDB.hasFile(path)) {
+      const blob = await window.AlbumDB.getFile(path)
+      if (blob) return URL.createObjectURL(blob)
+    }
+  } catch (e) {
+    console.error('DB error:', e)
   }
   
   const url = await signedUrl(path)
@@ -80,7 +129,7 @@ async function getUrl(item) {
       await window.AlbumDB.saveFile(path, blob)
       return URL.createObjectURL(blob)
     } catch (e) {
-      console.error('Error caching file:', e)
+      console.error('Fetch error:', e)
     }
   }
   
