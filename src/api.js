@@ -18,6 +18,18 @@ async function initApp() {
   await window.AlbumDB.initDB()
   await waitForSupabase()
   window.supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
+  
+  // Try to create albums table if it doesn't exist
+  try {
+    await window.supabaseClient.from('album').select('id').limit(1)
+  } catch (e) {
+    console.log('Album table might not exist, trying to create...')
+    try {
+      await window.supabaseClient.rpc('create_albums_table', {})
+    } catch (e2) {
+      console.log('Could not create albums table automatically')
+    }
+  }
 }
 
 async function checkAuth() {
@@ -101,21 +113,29 @@ async function loadAlbums() {
       const { data, error } = await window.supabaseClient.from(tableName)
         .select('*')
         .eq('user_id', userId)
-        .eq('is_deleted', false)
         .order('created_at', { ascending: false })
       
       if (!error && data) {
         console.log('Albums loaded from:', tableName, data.length)
-        if (data.length > 0) await window.AlbumDB.saveAlbums(data)
-        return data
+        // Filter is_deleted client-side if column exists
+        const filtered = data.filter(a => a.is_deleted !== true)
+        if (filtered.length > 0) await window.AlbumDB.saveAlbums(filtered)
+        return filtered
       }
     } catch (e) {
       console.log('Try table:', tableName, e.message)
     }
   }
   
-  console.log('No albums table found, using local cache')
-  return await window.AlbumDB.getAlbums()
+  // Try to get from local cache
+  const localAlbums = await window.AlbumDB.getAlbums()
+  if (localAlbums && localAlbums.length > 0) {
+    console.log('Using local albums:', localAlbums.length)
+    return localAlbums
+  }
+  
+  // No albums found
+  return []
 }
 
 async function getUrl(item) {
