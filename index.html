@@ -35,8 +35,7 @@
   <script>
     const SUPABASE_URL = "https://jodqkybcpxvqfxdqthfk.supabase.co"
     const SUPABASE_KEY = "sb_publishable_EClHgpUxwV7Bshxeva7fww_HejLA6OF"
-    window.supabaseLib = window.supabase || supabase
-    window.supabaseClient = window.supabaseLib.createClient(SUPABASE_URL, SUPABASE_KEY)
+    window.sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
 
     const session = localStorage.getItem('supabase_session')
     if (session) {
@@ -54,7 +53,7 @@
       
       errorEl.textContent = ''
       
-      const { error } = await window.supabase.auth.signInWithPassword({ email, password })
+      const { error } = await window.sbClient.auth.signInWithPassword({ email, password })
       
       if (error) {
         errorEl.textContent = error.message

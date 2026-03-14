@@ -11,7 +11,6 @@ const vImg = document.getElementById('vImg')
 const albumModal = document.getElementById('albumModal')
 const deleteModal = document.getElementById('deleteModal')
 
-// Tab navigation
 document.querySelectorAll('.tab').forEach(tab => {
   tab.onclick = () => {
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'))
@@ -21,12 +20,10 @@ document.querySelectorAll('.tab').forEach(tab => {
   }
 })
 
-// Modal controls
 document.getElementById('addBtn').onclick = () => albumModal.classList.add('show')
 document.getElementById('cancelBtn').onclick = () => albumModal.classList.remove('show')
 document.getElementById('noBtn').onclick = () => deleteModal.classList.remove('show')
 
-// Create album
 document.getElementById('saveBtn').onclick = async () => {
   const name = document.getElementById('albumName').value.trim()
   if (!name) return
@@ -38,7 +35,6 @@ document.getElementById('saveBtn').onclick = async () => {
   }
 }
 
-// Delete confirmation
 document.getElementById('yesBtn').onclick = async () => {
   deleteModal.classList.remove('show')
   if (deleteType === 'media' && deleteTarget) {
@@ -52,15 +48,18 @@ document.getElementById('yesBtn').onclick = async () => {
   deleteType = null
 }
 
-// Viewer controls
-document.getElementById('vClose').onclick = closeViewer
+document.getElementById('vClose').onclick = () => {
+  viewer.classList.remove('show')
+  document.getElementById('vMenu').style.display = 'none'
+  document.getElementById('vDropdown').style.display = 'none'
+}
 document.getElementById('vMenu').onclick = (e) => {
   e.stopPropagation()
   const menu = document.getElementById('vDropdown')
   menu.style.display = menu.style.display === 'block' ? 'none' : 'block'
 }
 viewer.onclick = (e) => {
-  if (e.target === viewer) closeViewer()
+  if (e.target === viewer) document.getElementById('vClose').onclick()
   document.getElementById('vDropdown').style.display = 'none'
 }
 
@@ -71,36 +70,25 @@ document.getElementById('vShare').onclick = async () => {
   if (url && navigator.share) {
     try { await navigator.share({ url, title: 'Foto' }) } catch (e) {}
   }
-  closeViewer()
+  document.getElementById('vClose').onclick()
 }
 
 document.getElementById('vDelete').onclick = () => {
   deleteType = 'media'
   deleteTarget = allMedia[currentIndex]
-  closeViewer()
+  document.getElementById('vClose').onclick()
   deleteModal.classList.add('show')
 }
 
-// Logout
 document.getElementById('logoutBtn').onclick = async () => {
   if (confirm('¿Cerrar sesión?')) {
     await window.AlbumAPI.logout()
-    location.href = 'index.html'
   }
 }
 
-function closeViewer() {
-  viewer.classList.remove('show')
-  document.getElementById('vMenu').style.display = 'none'
-  document.getElementById('vDropdown').style.display = 'none'
-}
-
 async function loadData() {
-  console.log('Loading data...')
   allMedia = await window.AlbumAPI.loadMedia()
-  console.log('Media:', allMedia.length)
   allAlbums = await window.AlbumAPI.loadAlbums()
-  console.log('Albums:', allAlbums.length)
   renderPhotos()
   renderAlbums()
 }
@@ -116,10 +104,7 @@ function renderPhotos() {
     div.className = 'item'
     const img = document.createElement('img')
     img.loading = 'lazy'
-    window.AlbumAPI.getUrl(item).then(url => { 
-      if (url) img.src = url 
-      else img.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100"%3E%3Crect fill="%23ffe0ec" width="100" height="100"/%3E%3Ctext fill="%23d63384" x="50" y="50" text-anchor="middle" dy=".3em"%3E📷%3C/text%3E%3C/svg%3E'
-    })
+    window.AlbumAPI.getUrl(item).then(url => { if (url) img.src = url })
     div.onclick = () => openViewer(i)
     div.appendChild(img)
     photoGrid.appendChild(div)
@@ -151,24 +136,13 @@ function openViewer(index) {
 }
 
 async function start() {
-  console.log('Starting app...')
   await window.AlbumAPI.initApp()
-  console.log('Initialized')
-  
   const ok = await window.AlbumAPI.checkAuth()
-  console.log('Auth:', ok)
-  
   if (!ok) {
-    alert('Sesión expirada. Por favor ingresa de nuevo.')
     location.href = 'index.html'
     return
   }
-  
   await loadData()
-  
-  if (allMedia.length === 0 && allAlbums.length === 0) {
-    alert('No se encontraron datos. Creando datos de prueba...')
-  }
 }
 
 start()

@@ -11,7 +11,6 @@ const deleteModal = document.getElementById('deleteModal')
 
 if (!albumId) location.href = 'dashboard.html'
 
-// Upload
 document.getElementById('uploadBtn').onclick = () => document.getElementById('fileInput').click()
 document.getElementById('fileInput').onchange = async (e) => {
   const files = Array.from(e.target.files)
@@ -22,17 +21,21 @@ document.getElementById('fileInput').onchange = async (e) => {
   e.target.value = ''
 }
 
-// Viewer controls
-document.getElementById('vClose').onclick = closeViewer
+document.getElementById('vClose').onclick = () => {
+  viewer.classList.remove('show')
+  document.getElementById('vMenu').style.display = 'none'
+  document.getElementById('vDropdown').style.display = 'none'
+}
 document.getElementById('vPrev').onclick = () => { if (currentIndex > 0) showMedia(--currentIndex) }
 document.getElementById('vNext').onclick = () => { if (currentIndex < media.length - 1) showMedia(++currentIndex) }
+
 document.getElementById('vMenu').onclick = (e) => {
   e.stopPropagation()
   const menu = document.getElementById('vDropdown')
   menu.style.display = menu.style.display === 'block' ? 'none' : 'block'
 }
 viewer.onclick = (e) => {
-  if (e.target === viewer) closeViewer()
+  if (e.target === viewer) document.getElementById('vClose').onclick()
   document.getElementById('vDropdown').style.display = 'none'
 }
 
@@ -43,11 +46,11 @@ document.getElementById('vShare').onclick = async () => {
   if (url && navigator.share) {
     try { await navigator.share({ url, title: 'Foto' }) } catch (e) {}
   }
-  closeViewer()
+  document.getElementById('vClose').onclick()
 }
 
 document.getElementById('vDelete').onclick = () => {
-  closeViewer()
+  document.getElementById('vClose').onclick()
   deleteModal.classList.add('show')
 }
 
@@ -74,12 +77,6 @@ document.getElementById('deleteBtn').onclick = async () => {
     await window.AlbumAPI.removeAlbum(albumId)
     location.href = 'dashboard.html'
   }
-}
-
-function closeViewer() {
-  viewer.classList.remove('show')
-  document.getElementById('vMenu').style.display = 'none'
-  document.getElementById('vDropdown').style.display = 'none'
 }
 
 async function loadData() {
